@@ -53,7 +53,7 @@ public final class App {
      * @param args paramter given
      */
     public static void main(final String[] args) {
-
+        launchLink(new String[] { "", "victorBDD", "victor" });
         if (args == null || args.length == 0) {
             DisplayHelp.callError(1);
             return;
@@ -122,6 +122,8 @@ public final class App {
             DisplayHelp.callHelp("contact", "userKey");
             return;
         }
+
+        launchAdd(args);
     }
 
     /**
@@ -237,8 +239,10 @@ public final class App {
         }
         UserResponse user = null;
         try {
+
+            UserResponse addUser = new UserService().addUser(args[1]);
             System.out.println("Utilisateur crée");
-            System.out.println(new UserService().addUser(args[1]));
+            System.out.println(addUser);
 
         } catch (NumberFormatException | IOException e) {
             LOGGER.error("Error lors de l'ajout de l'utilisateur en BDD");

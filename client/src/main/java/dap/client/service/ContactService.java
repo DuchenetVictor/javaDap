@@ -1,7 +1,6 @@
 package dap.client.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,11 +21,11 @@ public class ContactService extends HttpClient {
      */
     public Integer getNbrContact(final String userId) throws IOException {
 
-        InputStream inputStream = send("/nbrContact/" + userId, "GET");
+        String value = send("/nbrContact/" + userId, "GET");
 
         ObjectMapper mapper = new ObjectMapper();
 
-        return mapper.readValue(inputStream, Integer.class);
+        return mapper.readValue(value, Integer.class);
 
     }
 

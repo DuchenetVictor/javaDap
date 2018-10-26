@@ -2,9 +2,12 @@ package dap.client.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import org.apache.commons.io.IOUtils;
 
 import dap.client.Config;
 
@@ -27,18 +30,24 @@ public abstract class HttpClient {
      * @return inputStream of the response
      * @throws IOException throws if the construction of the call fail
      */
-    protected InputStream send(final String url, final String requestMethode) throws IOException {
+    protected String send(final String url, final String requestMethode) throws IOException {
+
         URL urlroot = new URL(Config.getConf().getRootUrl());
         HttpURLConnection httpConnection = (HttpURLConnection) new URL(urlroot, getControllerRootURL() + url)
                 .openConnection();
+        httpConnection.setRequestMethod(requestMethode);
+
         if (httpConnection.getResponseCode() != RESPONSE_OK_SERVEUR_STATUS_CODE) {
             throw new ConnectException("connexion echoué, code retour :" + httpConnection.getResponseCode());
         }
-        httpConnection.setRequestMethod(requestMethode);
 
-        InputStream response = httpConnection.getInputStream();
+        StringWriter writer = new StringWriter();
+        InputStream inputStream = httpConnection.getInputStream();
+        IOUtils.copy(inputStream, writer, "UTF-8");
+        String valueReturned = writer.toString();
+        inputStream.close();
 
-        return response;
+        return valueReturned;
 
     }
 

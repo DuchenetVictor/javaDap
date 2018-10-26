@@ -3,6 +3,7 @@ package fr.ynov.dap.dap.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.ynov.dap.dap.data.AppUser;
@@ -14,7 +15,8 @@ import fr.ynov.dap.dap.data.GoogleAccount;
  * @author David_tepoche
  *
  */
-@RestController("/user")
+@RestController
+@RequestMapping("/user")
 public class UserController extends BaseController {
 
     /**

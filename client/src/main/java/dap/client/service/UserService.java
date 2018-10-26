@@ -1,7 +1,6 @@
 package dap.client.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,9 +21,10 @@ public class UserService extends HttpClient {
      * @throws IOException dunno.
      */
     public UserResponse addUser(final String userKey) throws IOException {
-        InputStream inputStream = send("/add/" + userKey, "GET");
+        String value = send("/add/" + userKey, "GET");
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(inputStream, UserResponse.class);
+        UserResponse readValue = mapper.readValue(value, UserResponse.class);
+        return readValue;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package dap.client.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,9 +25,9 @@ public class GmailService extends HttpClient {
      * @throws IOException throw if the mapping fail
      */
     public Integer getNbrEmailUnread(final String userId) throws IOException {
-        InputStream inputStream = send("/nbrunreadmail/" + userId, "GET");
+        String value = send("/nbrunreadmail/" + userId, "GET");
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(inputStream, Integer.class);
+        return mapper.readValue(value, Integer.class);
 
     }
 }

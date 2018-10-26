@@ -1,7 +1,6 @@
 package dap.client.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,10 +25,10 @@ public class CalendarService extends HttpClient {
      * @throws IOException throws because of the mapping
      */
     public List<EventResponse> getNextEvent(final String userId, final Integer nbrOfNextEvent) throws IOException {
-        InputStream inputStream = send("/getNextEvent/" + nbrOfNextEvent + "/" + userId, "GET");
+        String value = send("/getNextEvent/" + nbrOfNextEvent + "/" + userId, "GET");
 
         ObjectMapper mapper = new ObjectMapper();
-        return Arrays.asList(mapper.readValue(inputStream, EventResponse[].class));
+        return Arrays.asList(mapper.readValue(value, EventResponse[].class));
     }
 
     @Override

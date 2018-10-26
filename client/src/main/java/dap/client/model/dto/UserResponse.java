@@ -6,7 +6,7 @@ public class UserResponse {
 
     private Integer id;
     private String userKey;
-    private List<GoogleAccountResponse> googleAccountResponses;
+    private List<GoogleAccountResponse> accounts;
 
     /**
      * @return the id
@@ -37,17 +37,17 @@ public class UserResponse {
     }
 
     /**
-     * @return the googleAccountResponses
+     * @return the accounts
      */
-    public List<GoogleAccountResponse> getGoogleAccountResponses() {
-        return googleAccountResponses;
+    public List<GoogleAccountResponse> getAccounts() {
+        return accounts;
     }
 
     /**
-     * @param googleAccountResponses the googleAccountResponses to set
+     * @param accounts the accounts to set
      */
-    public void setGoogleAccountResponses(List<GoogleAccountResponse> googleAccountResponses) {
-        this.googleAccountResponses = googleAccountResponses;
+    public void setAccounts(List<GoogleAccountResponse> accounts) {
+        this.accounts = accounts;
     }
 
 }

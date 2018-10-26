@@ -139,7 +139,7 @@ public class GoogleAccount extends BaseService {
      * Add a Google account (user will be prompt to connect and accept required
      * access).
      *
-     * @param accounName  the user to store Data
+     * @param accountName  the user to store Data
      * @param request     the HTTP request
      * @param userKey     user in Bdd
      * @param httpSession dunno.
@@ -147,7 +147,7 @@ public class GoogleAccount extends BaseService {
      * @throws GeneralSecurityException dunno.
      * @throws IOException              dunno.
      */
-    public String addAccount(final String accounName, final String userKey, final HttpServletRequest request,
+    public String addAccount(final String accountName, final String userKey, final HttpServletRequest request,
             final HttpSession httpSession) throws GeneralSecurityException, IOException {
         Credential credential;
         GoogleAuthorizationCodeFlow flow;
@@ -159,10 +159,19 @@ public class GoogleAccount extends BaseService {
         }
 
         flow = super.getFlow();
-        credential = flow.loadCredential(accounName);
+        credential = flow.loadCredential(accountName);
 
         if (credential != null && credential.getAccessToken() != null) {
-            stringReturn = "votre utilisateur a deja les autorisations pour utiliser les services !";
+            AppUser appUser = userAppRepository.findByUserKey(userKey);
+            Boolean accountAlreadyAdd = appUser.getAccounts().stream()
+                    .anyMatch(a -> a.getAccountName().equalsIgnoreCase(accountName));
+            if (!accountAlreadyAdd) {
+                fr.ynov.dap.dap.data.GoogleAccount gAccount = new fr.ynov.dap.dap.data.GoogleAccount();
+                gAccount.setAccountName(accountName);
+
+                appUser.addGoogleAccount(gAccount);
+                userAppRepository.save(appUser);
+            }
 
         } else {
             // redirect to the authorization flow
@@ -170,7 +179,7 @@ public class GoogleAccount extends BaseService {
             authorizationUrl.setRedirectUri(buildRedirectUri(request, config.getoAuth2CallbackUrl()));
 
             // store userKey and accountName in session for CallBack Access
-            httpSession.setAttribute("accountName", accounName);
+            httpSession.setAttribute("accountName", accountName);
             httpSession.setAttribute("userKey", userKey);
 
             stringReturn = "redirect:" + authorizationUrl.build();
