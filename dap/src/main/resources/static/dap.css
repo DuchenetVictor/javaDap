@@ -1,0 +1,7 @@
+h1 {
+	color: purple;
+}
+
+table, thead, tbody, tr, th {
+   border: .5px solid black;
+}
