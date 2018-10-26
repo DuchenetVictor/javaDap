@@ -31,20 +31,6 @@ public class AppUser {
     private String userKey;
 
     /**
-     * @return the userKey
-     */
-    public String getUserKey() {
-        return userKey;
-    }
-
-    /**
-     * @param usrKey the userKey to set
-     */
-    public void setUserKey(final String usrKey) {
-        this.userKey = usrKey;
-    }
-
-    /**
      * dunno.
      */
     @JsonManagedReference
@@ -56,6 +42,20 @@ public class AppUser {
      */
     public List<GoogleAccount> getAccounts() {
         return accounts;
+    }
+
+    /**
+     * @return the userKey
+     */
+    public String getUserKey() {
+        return userKey;
+    }
+
+    /**
+     * @param usrKey the userKey to set
+     */
+    public void setUserKey(final String usrKey) {
+        this.userKey = usrKey;
     }
 
     /**
