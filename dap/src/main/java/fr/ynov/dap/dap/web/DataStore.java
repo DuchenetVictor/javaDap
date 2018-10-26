@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.google.api.client.auth.oauth2.StoredCredential;
 
-import fr.ynov.dap.dap.google.UserInfoService;
+import fr.ynov.dap.dap.google.service.UserInfoService;
 import fr.ynov.dap.dap.model.StoredCredentialsResponse;
 /**
  *

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.ynov.dap.dap.data.AppUser;
 import fr.ynov.dap.dap.data.AppUserRepostory;
 import fr.ynov.dap.dap.data.GoogleAccount;
-import fr.ynov.dap.dap.google.GMailService;
+import fr.ynov.dap.dap.google.service.GMailService;
 
 /**
  *

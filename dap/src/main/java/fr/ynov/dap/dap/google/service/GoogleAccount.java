@@ -1,4 +1,4 @@
-package fr.ynov.dap.dap.google;
+package fr.ynov.dap.dap.google.service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -67,6 +67,7 @@ public class GoogleAccount extends BaseService {
             final Credential credential = flow.createAndStoreCredential(response, accountName);
             if (null == credential || null == credential.getAccessToken()) {
                 getLogger().warn("Trying to store a NULL AccessToken for user : " + accountName);
+
             }
 
             if (getLogger().isDebugEnabled() && null != credential && null != credential.getAccessToken()) {
@@ -139,7 +140,7 @@ public class GoogleAccount extends BaseService {
      * Add a Google account (user will be prompt to connect and accept required
      * access).
      *
-     * @param accountName  the user to store Data
+     * @param accountName the user to store Data
      * @param request     the HTTP request
      * @param userKey     user in Bdd
      * @param httpSession dunno.

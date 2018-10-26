@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import fr.ynov.dap.dap.google.GMailService;
+import fr.ynov.dap.dap.google.service.GMailService;
 
 /**
  *

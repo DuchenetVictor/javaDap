@@ -17,8 +17,8 @@ import com.google.api.services.calendar.model.Event;
 import fr.ynov.dap.dap.data.AppUser;
 import fr.ynov.dap.dap.data.AppUserRepostory;
 import fr.ynov.dap.dap.data.GoogleAccount;
-import fr.ynov.dap.dap.google.CalendarService;
-import fr.ynov.dap.dap.google.UserInfoService;
+import fr.ynov.dap.dap.google.service.CalendarService;
+import fr.ynov.dap.dap.google.service.UserInfoService;
 import fr.ynov.dap.dap.model.CalendarEvent;
 
 /**
