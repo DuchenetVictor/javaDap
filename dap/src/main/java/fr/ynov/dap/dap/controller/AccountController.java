@@ -75,7 +75,7 @@ public class AccountController extends BaseController {
 
     /**
      * get the index page, in order to login .
-     * 
+     *
      * @param model   an object look like httpSession ?
      * @param request the httpRequest from client
      * @return index

@@ -53,7 +53,6 @@ public final class App {
      * @param args paramter given
      */
     public static void main(final String[] args) {
-        launchLink(new String[] { "", "victorBDD", "victor" });
         if (args == null || args.length == 0) {
             DisplayHelp.callError(1);
             return;

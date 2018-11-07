@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
-//TODO: a mettre dnas un BaseController ? notamment les scopes !
+//TODO: a mettre dnas un BaseController ? notamment les scopes ?!
 public class AuthHelper {
     private static final String authority = "https://login.microsoftonline.com";
     private static final String authorizeUrl = authority + "/common/oauth2/v2.0/authorize";
