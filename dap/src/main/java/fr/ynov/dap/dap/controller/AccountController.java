@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.ynov.dap.dap.google.service.GoogleAccount;
+import fr.ynov.dap.dap.google.service.GoogleAccountService;
 import fr.ynov.dap.dap.helper.AuthHelper;
 
 /**
@@ -32,7 +32,7 @@ public class AccountController extends BaseController {
      * link googleAccount service.
      */
     @Autowired
-    private GoogleAccount googleAccount;
+    private GoogleAccountService googleAccountService;
 
     /**
      * Add a Google account (user will be prompt to connect and accept required
@@ -50,7 +50,7 @@ public class AccountController extends BaseController {
     public String addAccount(@PathVariable("userKey") final String userKey,
             @PathVariable("accountName") final String accountName, final HttpServletRequest request,
             final HttpSession session) throws GeneralSecurityException, IOException {
-        return googleAccount.addAccount(accountName, userKey, request, session);
+        return googleAccountService.addAccount(accountName, userKey, request, session);
     }
 
     /**
@@ -65,7 +65,7 @@ public class AccountController extends BaseController {
     @RequestMapping("/oAuth2Callback")
     public String oAuthCallback(@RequestParam final String code, final HttpServletRequest request,
             final HttpSession session) throws ServletException {
-        return googleAccount.oAuthCallback(code, request, session);
+        return googleAccountService.oAuthCallback(code, request, session);
     }
 
     @Override

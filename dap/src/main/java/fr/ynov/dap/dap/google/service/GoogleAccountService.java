@@ -18,7 +18,6 @@ import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.http.GenericUrl;
 
-import fr.ynov.dap.dap.Config;
 import fr.ynov.dap.dap.data.AppUser;
 import fr.ynov.dap.dap.data.AppUserRepostory;
 
@@ -28,13 +27,7 @@ import fr.ynov.dap.dap.data.AppUserRepostory;
  *
  */
 @Service
-public class GoogleAccount extends BaseService {
-
-    /**
-     * link config.
-     */
-    @Autowired
-    private Config config;
+public class GoogleAccountService extends BaseService {
 
     /**
      * link the appUser repository.
@@ -56,7 +49,7 @@ public class GoogleAccount extends BaseService {
             throws ServletException {
         final String decodedCode = extracCode(request);
 
-        final String redirectUri = buildRedirectUri(request, new Config().getoAuth2CallbackUrl());
+        final String redirectUri = buildRedirectUri(request, getConfig().getoAuth2CallbackUrl());
 
         final String accountName = session.getAttribute("accountName").toString();
         final String userKey = session.getAttribute("userKey").toString();
@@ -133,7 +126,7 @@ public class GoogleAccount extends BaseService {
 
     @Override
     protected final String getClassName() {
-        return GoogleAccount.class.getName();
+        return GoogleAccountService.class.getName();
     }
 
     /**
@@ -177,7 +170,7 @@ public class GoogleAccount extends BaseService {
         } else {
             // redirect to the authorization flow
             final AuthorizationCodeRequestUrl authorizationUrl = flow.newAuthorizationUrl();
-            authorizationUrl.setRedirectUri(buildRedirectUri(request, config.getoAuth2CallbackUrl()));
+            authorizationUrl.setRedirectUri(buildRedirectUri(request, getConfig().getoAuth2CallbackUrl()));
 
             // store userKey and accountName in session for CallBack Access
             httpSession.setAttribute("accountName", accountName);

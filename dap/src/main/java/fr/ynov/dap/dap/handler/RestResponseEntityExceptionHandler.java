@@ -32,7 +32,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
      */
     @ExceptionHandler(value = { Exception.class })
     protected ResponseEntity<Object> handleException(final RuntimeException ex, final WebRequest request) {
-        logger.error(ex.getMessage() + " \n" + request.getContextPath());
+        logger.error("Un erreur est survenue suite a l'appel de l'url : " + request.getContextPath(), ex);
         return new ResponseEntity<Object>("StackTrace: " + ex.getMessage(), new HttpHeaders(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }

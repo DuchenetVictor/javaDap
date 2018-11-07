@@ -1,7 +1,6 @@
 package fr.ynov.dap.dap.model;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
@@ -47,26 +46,32 @@ public class CalendarEvent {
         this.endDate = new Timestamp(event.getEnd().getDateTime().getValue());
         this.subject = event.getSummary();
         this.status = event.getStatus();
-        this.personnalStatus = setPersonnalStatus(event.getAttendees(), emailCurrentUser);
+
+        this.personnalStatus = setPersonnalStatus(event, emailCurrentUser);
     }
 
     /**
      * find the personnal status of the current user.
      *
-     * @param attendees list of people in the event
-     * @param email     the email of the current user
+     * @param event the GOOGLE Event
+     * @param email the email of the current user
      * @return the personnal status
      */
-    private String setPersonnalStatus(final List<EventAttendee> attendees, final String email) {
-        if (attendees == null) {
-            return null;
+    private String setPersonnalStatus(final Event event, final String email) {
+        String persoStatus;
+
+        if (event.getOrganizer() != null && email.equalsIgnoreCase(event.getOrganizer().getEmail())) {
+            personnalStatus = "Owner";
+        } else {
+            if (event.getAttendees() != null) {
+                EventAttendee attendee = event.getAttendees().stream().filter(a -> email.equalsIgnoreCase(a.getEmail()))
+                        .findFirst().orElse(null);
+                if (attendee != null) {
+                    personnalStatus = attendee.getResponseStatus();
+                }
+            }
         }
-        EventAttendee attendee = attendees.stream().filter(a -> a.getEmail().equalsIgnoreCase(email)).findFirst()
-                .orElse(null);
-        if (attendee != null) {
-            return attendee.getResponseStatus();
-        }
-        return null;
+        return personnalStatus;
     }
 
     /**

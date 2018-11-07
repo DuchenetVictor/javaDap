@@ -1,9 +1,19 @@
 package dap.client.model.dto;
 
+/**
+ *
+ * @author David_tepoche
+ *
+ */
 public class GoogleAccountResponse {
-
+    /**
+     * the id.
+     */
     private Integer id;
 
+    /**
+     * the accountName.
+     */
     private String accountName;
 
     /**
@@ -14,10 +24,10 @@ public class GoogleAccountResponse {
     }
 
     /**
-     * @param id the id to set
+     * @param googleAccountId the id to set
      */
-    public void setId(Integer id) {
-        this.id = id;
+    public void setId(final Integer googleAccountId) {
+        this.id = googleAccountId;
     }
 
     /**
@@ -28,10 +38,10 @@ public class GoogleAccountResponse {
     }
 
     /**
-     * @param accountName the accountName to set
+     * @param acctName the accountName to set
      */
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
+    public void setAccountName(final String acctName) {
+        this.accountName = acctName;
     }
 
 }

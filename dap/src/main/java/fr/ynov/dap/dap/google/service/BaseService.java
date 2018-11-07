@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,15 +33,31 @@ import fr.ynov.dap.dap.Config;
 public abstract class BaseService {
 
     /**
+     * link config.
+     */
+    @Autowired
+    private Config config;
+
+    /**
      * Initialize the logger.
      */
     private Logger logger = LogManager.getLogger(getClassName());
 
     /**
-     * link config.
+     * return the default instance a jackson factory.
      */
-    @Autowired
-    private Config config;
+    protected static final JacksonFactory JACKSON_FACTORY = JacksonFactory.getDefaultInstance();
+
+    /**
+     * list of all the scope required for the appli.
+     */
+    private static final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_LABELS, CalendarScopes.CALENDAR_READONLY,
+            PeopleServiceScopes.CONTACTS_READONLY, Oauth2Scopes.USERINFO_EMAIL);
+
+    /**
+     * stock the defaultUser.
+     */
+    private static String defaultUser = "victorTEST@gmail.com";
 
     /**
      * store and obtain a credential for accessing protected resources.
@@ -64,7 +80,7 @@ public abstract class BaseService {
         FileDataStoreFactory fileDataStoreFactory = new FileDataStoreFactory(new File(pathname));
 
         return new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), JACKSON_FACTORY,
-                clientSecrets, scopes()).setDataStoreFactory(fileDataStoreFactory).setAccessType("offline").build();
+                clientSecrets, SCOPES).setDataStoreFactory(fileDataStoreFactory).setAccessType("offline").build();
     }
 
     /**
@@ -88,21 +104,11 @@ public abstract class BaseService {
     }
 
     /**
-     * return the default instance a jackson factory.
-     */
-    protected static final JacksonFactory JACKSON_FACTORY = JacksonFactory.getDefaultInstance();
-
-    /**
      * get the current class name.
      *
      * @return ClassName
      */
     protected abstract String getClassName();
-
-    /**
-     * stock the defaultUser.
-     */
-    private static String defaultUser = "Victorduchenet@gmail.com";
 
     /**
      * @return the defaultUser
@@ -112,17 +118,9 @@ public abstract class BaseService {
     }
 
     /**
-     * list Scopes required for all the service.
-     *
-     * @return list a scope
+     * @return the config
      */
-    private List<String> scopes() {
-        List<String> scopes = new ArrayList<>();
-        scopes.add(GmailScopes.GMAIL_LABELS);
-        scopes.add(CalendarScopes.CALENDAR_READONLY);
-        scopes.add(PeopleServiceScopes.CONTACTS_READONLY);
-        scopes.add(Oauth2Scopes.USERINFO_EMAIL);
-        return scopes;
+    protected Config getConfig() {
+        return config;
     }
-
 }

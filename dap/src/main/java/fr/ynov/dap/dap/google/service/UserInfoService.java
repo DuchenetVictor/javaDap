@@ -3,15 +3,12 @@ package fr.ynov.dap.dap.google.service;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.util.store.DataStore;
 import com.google.api.services.oauth2.Oauth2;
-
-import fr.ynov.dap.dap.Config;
 
 /**
  *
@@ -22,12 +19,6 @@ import fr.ynov.dap.dap.Config;
 public class UserInfoService extends BaseService {
 
     /**
-     * link the config.
-     */
-    @Autowired
-    private Config config;
-
-    /**
      *
      * @param userId user key
      * @return the Oauth2 service
@@ -36,7 +27,7 @@ public class UserInfoService extends BaseService {
      */
     private Oauth2 getService(final String userId) throws GeneralSecurityException, IOException {
         return new Oauth2.Builder(GoogleNetHttpTransport.newTrustedTransport(), JACKSON_FACTORY, getCredential(userId))
-                .setApplicationName(config.getApplicationName()).build();
+                .setApplicationName(getConfig().getApplicationName()).build();
     }
 
     @Override

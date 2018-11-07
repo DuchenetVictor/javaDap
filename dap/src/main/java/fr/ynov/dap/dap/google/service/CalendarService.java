@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -13,18 +12,11 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 
-import fr.ynov.dap.dap.Config;
-
 /**
  * @author David_tepoche
  */
 @Service
 public class CalendarService extends BaseService {
-    /**
-     * link config.
-     */
-    @Autowired
-    private Config config;
 
     /**
      *
@@ -37,7 +29,7 @@ public class CalendarService extends BaseService {
      */
     private Calendar getService(final String userId) throws GeneralSecurityException, IOException {
         return new Calendar.Builder(GoogleNetHttpTransport.newTrustedTransport(), JACKSON_FACTORY,
-                getCredential(userId)).setApplicationName(config.getApplicationName()).build();
+                getCredential(userId)).setApplicationName(getConfig().getApplicationName()).build();
     }
 
     @Override

@@ -6,33 +6,56 @@ package fr.ynov.dap.dap;
  *
  */
 public class Config {
+    /**
+     * name of the application.
+     */
+    private static final String APPLICATION_NAME = "YnovDaP";
 
     /**
-     *
+     * folder's name of the credentials.
      */
-    public Config() {
+    private static final String CREDENTIALS_FOLDER_NAME = "token";
 
-    }
+    /**
+     * file's name of the client' secret.
+     */
+    private static final String SECRETS_CLIENT_FILE_NAME = "credentials.json";
+
+    /**
+     * root of the redirect url.
+     */
+    private static final String ROOT_URL_REDIRECT = "/oAuth2Callback";
 
     /**
      * store the oAuth2CallbackUrl.
      */
-    private String oAuth2CallbackUrl = "/oAuth2Callback";
+    private String oAuth2CallbackUrl = ROOT_URL_REDIRECT;
 
     /**
     *
     */
-    private String clientSecretFile = "credentials.json";
+    private String clientSecretFile = SECRETS_CLIENT_FILE_NAME;
 
     /**
     *
     */
-    private String applicationName = "YnovDaP";
+    private String applicationName = APPLICATION_NAME;
 
     /**
     *
     */
-    private String credentialsFolder = "token";
+    private String credentialsFolder = CREDENTIALS_FOLDER_NAME;
+
+    /**
+     * get the directory of the dataStore default = the home directory of the user.
+     */
+    private String dataStoreDirectory = System.getProperty("user.home");
+
+    /**
+    *
+    */
+    public Config() {
+    }
 
     /**
      * @return the oAuth2CallbackUrl
@@ -40,11 +63,6 @@ public class Config {
     public String getoAuth2CallbackUrl() {
         return oAuth2CallbackUrl;
     }
-
-    /**
-     * get the directory of the dataStore default = the home directory of the user.
-     */
-    private String dataStoreDirectory = System.getProperty("user.home");
 
     /**
      *

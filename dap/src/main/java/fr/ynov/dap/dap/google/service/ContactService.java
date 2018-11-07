@@ -3,13 +3,10 @@ package fr.ynov.dap.dap.google.service;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.services.people.v1.PeopleService;
-
-import fr.ynov.dap.dap.Config;
 
 /**
  *
@@ -20,12 +17,6 @@ import fr.ynov.dap.dap.Config;
 public class ContactService extends BaseService {
 
     /**
-     * link with config.
-     */
-    @Autowired
-    private Config config;
-
-    /**
      *
      * @param userId user key
      * @return Gmail service.
@@ -34,7 +25,7 @@ public class ContactService extends BaseService {
      */
     private PeopleService getService(final String userId) throws GeneralSecurityException, IOException {
         return new PeopleService.Builder(GoogleNetHttpTransport.newTrustedTransport(), JACKSON_FACTORY,
-                getCredential(userId)).setApplicationName(config.getApplicationName()).build();
+                getCredential(userId)).setApplicationName(getConfig().getApplicationName()).build();
     }
 
     /**

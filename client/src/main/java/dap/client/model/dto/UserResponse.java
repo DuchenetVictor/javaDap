@@ -2,10 +2,25 @@ package dap.client.model.dto;
 
 import java.util.List;
 
+/**
+ *
+ * @author David_tepoche
+ *
+ */
 public class UserResponse {
 
+    /**
+     * id.
+     */
     private Integer id;
+    /**
+     * user in BDD.
+     */
     private String userKey;
+
+    /**
+     * all the account related of the userKey.
+     */
     private List<GoogleAccountResponse> accounts;
 
     /**
@@ -16,10 +31,10 @@ public class UserResponse {
     }
 
     /**
-     * @param id the id to set
+     * @param userId the id to set
      */
-    public void setId(Integer id) {
-        this.id = id;
+    public void setId(final Integer userId) {
+        this.id = userId;
     }
 
     /**
@@ -30,10 +45,10 @@ public class UserResponse {
     }
 
     /**
-     * @param userKey the userKey to set
+     * @param usrKey the userKey to set
      */
-    public void setUserKey(String userKey) {
-        this.userKey = userKey;
+    public void setUserKey(final String usrKey) {
+        this.userKey = usrKey;
     }
 
     /**
@@ -44,10 +59,10 @@ public class UserResponse {
     }
 
     /**
-     * @param accounts the accounts to set
+     * @param accts the accounts to set
      */
-    public void setAccounts(List<GoogleAccountResponse> accounts) {
-        this.accounts = accounts;
+    public void setAccounts(final List<GoogleAccountResponse> accts) {
+        this.accounts = accts;
     }
 
 }

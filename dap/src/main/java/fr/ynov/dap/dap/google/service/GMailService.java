@@ -3,14 +3,11 @@ package fr.ynov.dap.dap.google.service;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Label;
-
-import fr.ynov.dap.dap.Config;
 
 /**
  * @author David_tepoche
@@ -18,11 +15,6 @@ import fr.ynov.dap.dap.Config;
  */
 @Service
 public class GMailService extends BaseService {
-    /**
-     * link config.
-     */
-    @Autowired
-    private Config config;
 
     /**
      *
@@ -33,7 +25,7 @@ public class GMailService extends BaseService {
      */
     private Gmail getService(final String user) throws GeneralSecurityException, IOException {
         return new Gmail.Builder(GoogleNetHttpTransport.newTrustedTransport(), JACKSON_FACTORY, getCredential(user))
-                .setApplicationName(config.getApplicationName()).build();
+                .setApplicationName(getConfig().getApplicationName()).build();
     }
 
     @Override
