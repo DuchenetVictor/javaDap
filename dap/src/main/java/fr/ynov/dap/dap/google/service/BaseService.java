@@ -1,9 +1,10 @@
 package fr.ynov.dap.dap.google.service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
@@ -71,9 +72,11 @@ public abstract class BaseService {
         final String clientSecretFile = config.getClientSecretFile();
         final String tokenFile = config.getCredentialsFolder();
 
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        InputStream is = classloader.getResourceAsStream(clientSecretFile);
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JACKSON_FACTORY, new InputStreamReader(is));
+        FileInputStream istreamClientSecretFile = new FileInputStream(
+                config.getDataStoreDirectory() + File.separator + clientSecretFile);
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JACKSON_FACTORY,
+                new InputStreamReader(istreamClientSecretFile, Charset.forName("UTF-8")));
 
         String pathname = config.getDataStoreDirectory() + File.separator + tokenFile;
 
@@ -93,7 +96,6 @@ public abstract class BaseService {
      */
     protected Credential getCredential(final String accountName) throws IOException, GeneralSecurityException {
         return getFlow().loadCredential(accountName);
-
     }
 
     /**
