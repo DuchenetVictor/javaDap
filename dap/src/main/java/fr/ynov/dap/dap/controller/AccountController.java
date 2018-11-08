@@ -12,12 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.api.client.auth.oauth2.TokenResponse;
+
 import fr.ynov.dap.dap.google.service.GoogleAccountService;
 import fr.ynov.dap.dap.helper.AuthHelper;
+import fr.ynov.dap.dap.model.IdToken;
 
 /**
  * used to connect or retrieve token for an userID.
@@ -97,4 +101,40 @@ public class AccountController extends BaseController {
         return "index";
     }
 
+    /**
+     * dunno.
+     *
+     * @param code    dunno
+     * @param idToken dunno
+     * @param state   dunno
+     * @param request dunno
+     * @return dunno
+     */
+    @PostMapping(value = "/authorize")
+    public String authorize(@RequestParam("code") final String code, @RequestParam("id_token") final String idToken,
+            @RequestParam("state") final UUID state, final HttpServletRequest request) {
+
+        // Get the expected state value from the session
+        HttpSession session = request.getSession();
+        UUID expectedState = (UUID) session.getAttribute("expected_state");
+        UUID expectedNonce = (UUID) session.getAttribute("expected_nonce");
+
+        // Make sure that the state query parameter returned matches
+        // the expected state
+        if (state.equals(expectedState)) {
+            IdToken idTokenObj = IdToken.parseEncodedToken(idToken, expectedNonce.toString());
+            if (idTokenObj != null) {
+                TokenResponse tokenResponse = AuthHelper.getTokenFromAuthCode(code, idTokenObj.getTenantId());
+                session.setAttribute("tokens", tokenResponse);
+                session.setAttribute("userConnected", true);
+                session.setAttribute("userName", idTokenObj.getName());
+                session.setAttribute("userTenantId", idTokenObj.getTenantId());
+            } else {
+                session.setAttribute("error", "ID token failed validation.");
+            }
+        } else {
+            session.setAttribute("error", "Unexpected state returned from authority.");
+        }
+        return "mail";
+    }
 }
