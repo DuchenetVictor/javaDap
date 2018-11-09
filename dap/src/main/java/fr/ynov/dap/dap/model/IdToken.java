@@ -17,21 +17,52 @@ public class IdToken {
     // NOTE: This is just a subset of the claims returned in the
     // ID token. For a full listing, see:
     // https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-tokens/#idtokens
+    /**
+     * epiration of token.
+     */
     @JsonProperty("exp")
     private long expirationTime;
+    /**
+     * time before expiration.
+     */
     @JsonProperty("nbf")
     private long notBefore;
+    /**
+     * .
+     */
     @JsonProperty("tid")
     private String tenantId;
+    /*
+     * dunno.
+     */
     private String nonce;
+    /**
+     * .
+     */
     private String name;
+    /**
+     * .
+     */
     private String email;
+    /**
+     * .
+     */
     @JsonProperty("preferred_username")
     private String preferredUsername;
+    /**
+     * .
+     */
     @JsonProperty("oid")
     private String objectId;
 
-    public static IdToken parseEncodedToken(String encodedToken, String nonce) {
+    /**
+     * dunno.
+     *
+     * @param encodedToken dunno
+     * @param nonce        dunno
+     * @return dunno
+     */
+    public static IdToken parseEncodedToken(final String encodedToken, final String nonce) {
         // Encoded token is in three parts, separated by '.'
         String[] tokenParts = encodedToken.split("\\.");
 

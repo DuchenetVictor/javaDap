@@ -5,6 +5,7 @@ import java.security.GeneralSecurityException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,12 +138,13 @@ public class GoogleAccountService extends BaseService {
      * @param request     the HTTP request
      * @param userKey     user in Bdd
      * @param httpSession dunno.
-     * @return the view to Display (on Error)
+     * @param response    dunno
      * @throws GeneralSecurityException dunno.
      * @throws IOException              dunno.
      */
-    public String addAccount(final String accountName, final String userKey, final HttpServletRequest request,
-            final HttpSession httpSession) throws GeneralSecurityException, IOException {
+    public void addAccount(final String accountName, final String userKey, final HttpServletRequest request,
+            final HttpSession httpSession, final HttpServletResponse response)
+            throws GeneralSecurityException, IOException {
         Credential credential;
         GoogleAuthorizationCodeFlow flow;
         String stringReturn = "";
@@ -176,9 +178,8 @@ public class GoogleAccountService extends BaseService {
             httpSession.setAttribute("accountName", accountName);
             httpSession.setAttribute("userKey", userKey);
 
-            stringReturn = "redirect:" + authorizationUrl.build();
+            response.sendRedirect(authorizationUrl.build());
         }
-        return stringReturn;
 
     }
 

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.api.client.auth.oauth2.TokenResponse;
 
+import fr.ynov.dap.dap.SecretFileAccesException;
 import fr.ynov.dap.dap.google.service.GoogleAccountService;
-import fr.ynov.dap.dap.helper.AuthHelper;
+import fr.ynov.dap.dap.microsoft.services.MicrosoftAccountService;
 import fr.ynov.dap.dap.model.IdToken;
 
 /**
@@ -37,6 +39,11 @@ public class AccountController extends BaseController {
      */
     @Autowired
     private GoogleAccountService googleAccountService;
+    /**
+     * link microsoftAccount service.
+     */
+    @Autowired
+    private MicrosoftAccountService microsoftAccountService;
 
     /**
      * Add a Google account (user will be prompt to connect and accept required
@@ -46,15 +53,16 @@ public class AccountController extends BaseController {
      * @param accountName alis for googleAccount
      * @param request     the HTTP request
      * @param session     the HTTP session
-     * @return the view to Display (on Error)
+     * @param response    dunno
      * @throws GeneralSecurityException throw if the addCount fail
      * @throws IOException              throw if the call from accountService fail
      */
     @GetMapping("/account/add/{userKey}/{accountName}")
-    public String addAccount(@PathVariable("userKey") final String userKey,
+    public void addAccount(@PathVariable("userKey") final String userKey,
             @PathVariable("accountName") final String accountName, final HttpServletRequest request,
-            final HttpSession session) throws GeneralSecurityException, IOException {
-        return googleAccountService.addAccount(accountName, userKey, request, session);
+            final HttpSession session, final HttpServletResponse response)
+            throws GeneralSecurityException, IOException {
+        googleAccountService.addAccount(accountName, userKey, request, session, response);
     }
 
     /**
@@ -80,12 +88,15 @@ public class AccountController extends BaseController {
     /**
      * get the index page, in order to login .
      *
-     * @param model   an object look like httpSession ?
-     * @param request the httpRequest from client
-     * @return index
+     * @param model    an object look like httpSession
+     * @param request  the httpRequest from client
+     * @param response dunno.
+     * @throws IOException              dunno.
+     * @throws SecretFileAccesException dunno
      */
     @GetMapping("/index")
-    public String index(final Model model, final HttpServletRequest request) {
+    public void index(final HttpServletResponse response, final Model model, final HttpServletRequest request)
+            throws IOException, SecretFileAccesException {
         UUID state = UUID.randomUUID();
         UUID nonce = UUID.randomUUID();
 
@@ -95,10 +106,10 @@ public class AccountController extends BaseController {
         session.setAttribute("expected_state", state);
         session.setAttribute("expected_nonce", nonce);
 
-        String loginUrl = AuthHelper.getLoginUrl(state, nonce);
-        model.addAttribute("loginUrl", loginUrl);
-        // Name of a definition in WEB-INF/defs/pages.xml
-        return "index";
+        String loginUrl = null;
+        loginUrl = microsoftAccountService.getLoginUrl(state, nonce);
+
+        response.sendRedirect(loginUrl);
     }
 
     /**
@@ -109,10 +120,11 @@ public class AccountController extends BaseController {
      * @param state   dunno
      * @param request dunno
      * @return dunno
+     * @throws SecretFileAccesException dunno
      */
     @PostMapping(value = "/authorize")
     public String authorize(@RequestParam("code") final String code, @RequestParam("id_token") final String idToken,
-            @RequestParam("state") final UUID state, final HttpServletRequest request) {
+            @RequestParam("state") final UUID state, final HttpServletRequest request) throws SecretFileAccesException {
 
         // Get the expected state value from the session
         HttpSession session = request.getSession();
@@ -124,7 +136,8 @@ public class AccountController extends BaseController {
         if (state.equals(expectedState)) {
             IdToken idTokenObj = IdToken.parseEncodedToken(idToken, expectedNonce.toString());
             if (idTokenObj != null) {
-                TokenResponse tokenResponse = AuthHelper.getTokenFromAuthCode(code, idTokenObj.getTenantId());
+                TokenResponse tokenResponse;
+                tokenResponse = microsoftAccountService.getTokenFromAuthCode(code, idTokenObj.getTenantId());
                 session.setAttribute("tokens", tokenResponse);
                 session.setAttribute("userConnected", true);
                 session.setAttribute("userName", idTokenObj.getName());
@@ -135,6 +148,7 @@ public class AccountController extends BaseController {
         } else {
             session.setAttribute("error", "Unexpected state returned from authority.");
         }
-        return "mail";
+        // TODO
+        return "done";
     }
 }

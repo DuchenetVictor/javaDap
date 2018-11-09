@@ -69,7 +69,7 @@ public abstract class BaseService {
      */
     protected GoogleAuthorizationCodeFlow getFlow() throws IOException, GeneralSecurityException {
 
-        final String clientSecretFile = config.getClientSecretFile();
+        final String clientSecretFile = config.getGoogleClientSecretFile();
         final String tokenFile = config.getCredentialsFolder();
 
         FileInputStream istreamClientSecretFile = new FileInputStream(
