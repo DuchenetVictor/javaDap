@@ -31,17 +31,35 @@ public class AppUser {
     private String userKey;
 
     /**
-     * dunno.
+     * Stock google accounts for an user.
+     *
+     * @JsonManagedReference is for avoid jackson mapper to create an infinity loop.
      */
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
-    private List<GoogleAccount> accounts;
+    private List<GoogleAccount> gAccounts;
 
     /**
-     * @return the accounts
+     * Stock microsoft accounts for an user.
+     *
+     * @JsonManagedReference is for avoid jackson mapper to create an infinity loop.
      */
-    public List<GoogleAccount> getAccounts() {
-        return accounts;
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
+    private List<MicrosoftAccount> mAccounts;
+
+    /**
+     * @return the gAccounts
+     */
+    public List<GoogleAccount> getgAccounts() {
+        return gAccounts;
+    }
+
+    /**
+     * @return the mAccounts
+     */
+    public List<MicrosoftAccount> getmAccounts() {
+        return mAccounts;
     }
 
     /**
@@ -79,7 +97,17 @@ public class AppUser {
      */
     public void addGoogleAccount(final GoogleAccount gAccount) {
         gAccount.setOwner(this);
-        this.getAccounts().add(gAccount);
+        this.gAccounts.add(gAccount);
+    }
+
+    /**
+     * save microsftAccount and the link between them.
+     *
+     * @param micorsoftAccount the google account that the userapp have
+     */
+    public void addMicrosoftAccount(final MicrosoftAccount micorsoftAccount) {
+        micorsoftAccount.setOwner(this);
+        this.mAccounts.add(micorsoftAccount);
     }
 
 }

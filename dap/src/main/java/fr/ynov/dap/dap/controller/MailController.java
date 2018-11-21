@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.ynov.dap.dap.data.AppUser;
 import fr.ynov.dap.dap.data.AppUserRepostory;
 import fr.ynov.dap.dap.data.GoogleAccount;
+import fr.ynov.dap.dap.data.MicrosoftAccount;
 import fr.ynov.dap.dap.google.service.GMailService;
+import fr.ynov.dap.dap.microsoft.services.MicrosoftMailService;
 
 /**
  *
@@ -21,13 +23,19 @@ import fr.ynov.dap.dap.google.service.GMailService;
  */
 @RestController
 @RequestMapping("/emails")
-public class GmailController extends BaseController {
+public class MailController extends BaseController {
 
     /**
      * dunno.
      */
     @Autowired
     private GMailService gmailService;
+
+    /**
+     * dunno.
+     */
+    @Autowired
+    private MicrosoftMailService microsoftMailService;
 
     /**
      * link appUser repository.
@@ -54,8 +62,11 @@ public class GmailController extends BaseController {
             throw new NullPointerException("Utilisateur non present en base de donnée");
         }
 
-        for (GoogleAccount account : appUser.getAccounts()) {
+        for (GoogleAccount account : appUser.getgAccounts()) {
             nbrEmailUnread += gmailService.nbrEmailUnread(account.getAccountName());
+        }
+        for (MicrosoftAccount account : appUser.getmAccounts()) {
+            nbrEmailUnread += microsoftMailService.nbrMailUnread(account);
         }
 
         return nbrEmailUnread;
@@ -64,6 +75,6 @@ public class GmailController extends BaseController {
     @Override
     public final String getClassName() {
         // TODO Auto-generated method stub
-        return GmailController.class.getName();
+        return MailController.class.getName();
     }
 }

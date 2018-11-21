@@ -54,7 +54,7 @@ public class ContactController extends BaseController {
             throw new NullPointerException("Utilisateur non present en base de donnée");
         }
         Integer nbrContact = 0;
-        for (GoogleAccount account : appUser.getAccounts()) {
+        for (GoogleAccount account : appUser.getgAccounts()) {
             nbrContact += contactService.getNbrContact(account.getAccountName());
         }
         return nbrContact;

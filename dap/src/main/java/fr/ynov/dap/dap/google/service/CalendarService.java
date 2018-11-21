@@ -16,7 +16,7 @@ import com.google.api.services.calendar.model.Events;
  * @author David_tepoche
  */
 @Service
-public class CalendarService extends BaseService {
+public class CalendarService extends GoogleBaseService {
 
     /**
      *

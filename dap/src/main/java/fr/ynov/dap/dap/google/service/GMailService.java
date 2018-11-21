@@ -14,7 +14,7 @@ import com.google.api.services.gmail.model.Label;
  *
  */
 @Service
-public class GMailService extends BaseService {
+public class GMailService extends GoogleBaseService {
 
     /**
      *
