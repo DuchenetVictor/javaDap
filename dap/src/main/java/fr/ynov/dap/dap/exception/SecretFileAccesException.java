@@ -1,4 +1,4 @@
-package fr.ynov.dap.dap;
+package fr.ynov.dap.dap.exception;
 
 /**
  * @author David_tepoche

@@ -10,7 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.google.api.client.auth.oauth2.TokenResponse;
 
-import fr.ynov.dap.dap.SecretFileAccesException;
+import fr.ynov.dap.dap.exception.SecretFileAccesException;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;

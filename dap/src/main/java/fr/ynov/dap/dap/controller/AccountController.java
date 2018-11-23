@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.api.client.auth.oauth2.TokenResponse;
 
-import fr.ynov.dap.dap.SecretFileAccesException;
+import fr.ynov.dap.dap.exception.SecretFileAccesException;
 import fr.ynov.dap.dap.google.service.GoogleAccountService;
 import fr.ynov.dap.dap.microsoft.services.MicrosoftAccountService;
 import fr.ynov.dap.dap.model.IdToken;

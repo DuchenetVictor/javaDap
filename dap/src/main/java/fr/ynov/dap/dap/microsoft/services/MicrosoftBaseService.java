@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.ynov.dap.dap.Config;
-import fr.ynov.dap.dap.SecretFileAccesException;
+import fr.ynov.dap.dap.exception.SecretFileAccesException;
 
 /**
  *
