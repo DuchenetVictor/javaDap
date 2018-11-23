@@ -31,7 +31,7 @@ import fr.ynov.dap.dap.Config;
  * @author David_tepoche
  *
  */
-public abstract class BaseService {
+public abstract class GoogleBaseService {
 
     /**
      * link config.

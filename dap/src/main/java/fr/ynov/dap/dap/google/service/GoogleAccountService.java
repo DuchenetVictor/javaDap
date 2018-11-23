@@ -28,7 +28,7 @@ import fr.ynov.dap.dap.data.AppUserRepostory;
  *
  */
 @Service
-public class GoogleAccountService extends BaseService {
+public class GoogleAccountService extends GoogleBaseService {
 
     /**
      * link the appUser repository.
@@ -147,7 +147,6 @@ public class GoogleAccountService extends BaseService {
             throws GeneralSecurityException, IOException {
         Credential credential;
         GoogleAuthorizationCodeFlow flow;
-        String stringReturn = "";
 
         if (userAppRepository.findByUserKey(userKey) == null) {
             getLogger().warn("ajout d'un compte pour un utilisateur non present en bdd: " + userKey);
@@ -159,7 +158,7 @@ public class GoogleAccountService extends BaseService {
 
         if (credential != null && credential.getAccessToken() != null) {
             AppUser appUser = userAppRepository.findByUserKey(userKey);
-            Boolean accountAlreadyAdd = appUser.getAccounts().stream()
+            Boolean accountAlreadyAdd = appUser.getgAccounts().stream()
                     .anyMatch(a -> a.getAccountName().equalsIgnoreCase(accountName));
             if (!accountAlreadyAdd) {
                 fr.ynov.dap.dap.data.GoogleAccount gAccount = new fr.ynov.dap.dap.data.GoogleAccount();

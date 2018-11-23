@@ -16,7 +16,7 @@ import com.google.api.services.oauth2.Oauth2;
  *
  */
 @Service
-public class UserInfoService extends BaseService {
+public class UserInfoService extends GoogleBaseService {
 
     /**
      *

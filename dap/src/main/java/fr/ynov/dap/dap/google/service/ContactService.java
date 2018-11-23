@@ -14,7 +14,7 @@ import com.google.api.services.people.v1.PeopleService;
  *
  */
 @Service
-public class ContactService extends BaseService {
+public class ContactService extends GoogleBaseService {
 
     /**
      *

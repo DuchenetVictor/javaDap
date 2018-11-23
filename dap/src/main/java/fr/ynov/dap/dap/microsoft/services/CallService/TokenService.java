@@ -1,7 +1,6 @@
-package fr.ynov.dap.dap.microsoft.services;
+package fr.ynov.dap.dap.microsoft.services.CallService;
 
-import com.google.api.client.auth.oauth2.TokenResponse;
-
+import fr.ynov.dap.dap.model.TokenResponse;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;

@@ -71,7 +71,7 @@ public class CalendarController extends BaseController {
         }
 
         List<CalendarEvent> calendarEvents = new ArrayList<>();
-        for (GoogleAccount account : appUser.getAccounts()) {
+        for (GoogleAccount account : appUser.getgAccounts()) {
             List<Event> lastEvents = calendarService.getLastEvent(Integer.valueOf(nbrEvent), account.getAccountName());
 
             String userEmail = userInfoService.getEmail(account.getAccountName());

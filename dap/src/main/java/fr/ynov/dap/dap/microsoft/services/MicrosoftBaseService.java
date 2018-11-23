@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,6 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.ynov.dap.dap.Config;
 import fr.ynov.dap.dap.exception.SecretFileAccesException;
+import fr.ynov.dap.dap.microsoft.services.CallService.TokenService;
+import fr.ynov.dap.dap.model.TokenResponse;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 /**
  *
@@ -103,6 +115,86 @@ abstract class MicrosoftBaseService {
             }
         }
         return clientProperties;
+    }
+
+    /**
+     * dunno .
+     *
+     * @param expirationDate dunno
+     * @param refreshToken   dunno
+     * @param accesToken     dunno
+     * @param tenantId       dunno
+     * @return dunno
+     * @throws IOException              dunno
+     * @throws SecretFileAccesException dunno
+     */
+    public TokenResponse ensureTokens(final Date expirationDate, final String refreshToken, final String accesToken,
+            final String tenantId) throws IOException, SecretFileAccesException {
+        // Are tokens still valid?
+        Calendar now = Calendar.getInstance();
+        if (now.getTime().before(expirationDate)) {
+            // Still valid, return them as-is
+            TokenResponse tokens = new TokenResponse();
+            tokens.setAccessToken(accesToken);
+
+            tokens.setExpirationTime(expirationDate);
+            tokens.setRefreshToken(refreshToken);
+            return tokens;
+        } else {
+            // Expired, refresh the tokens
+            // Create a logging interceptor to log request and responses
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+            // Create and configure the Retrofit object
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(getConfig().getMicrosoftAuthorityUrl()).client(client)
+                    .addConverterFactory(JacksonConverterFactory.create()).build();
+
+            // Generate the token service
+            TokenService tokenService = retrofit.create(TokenService.class);
+
+            return tokenService.getAccessTokenFromRefreshToken(tenantId, getAppId(), getAppPassword(), "refresh_token",
+                    refreshToken, getRedirectUrl()).execute().body();
+        }
+    }
+
+    /**
+     * dunno.
+     *
+     * @param accessToken dunno
+     * @return dunno
+     */
+    protected Retrofit getRetrofit(final String accessToken) {
+        // Create a logging interceptor to log request and responses
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+
+        Interceptor requestInterceptor = new Interceptor() {
+            @Override
+            public Response intercept(final Interceptor.Chain chain) throws IOException {
+                Request original = chain.request();
+                okhttp3.Request.Builder builder = original.newBuilder().header("User-Agent", "java-tutorial")
+                        .header("client-request-id", UUID.randomUUID().toString())
+                        .header("return-client-request-id", "true")
+                        .header("Authorization", String.format("Bearer %s", accessToken))
+                        .method(original.method(), original.body());
+
+                Request request = builder.build();
+                return chain.proceed(request);
+            }
+        };
+
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(requestInterceptor).addInterceptor(interceptor)
+                .build();
+
+        // Create and configure the Retrofit object
+        return new Retrofit.Builder().baseUrl(config.getMicrosoftAuthorityUrl()).client(client)
+                .addConverterFactory(JacksonConverterFactory.create()).build();
+
+        // TODO mettre le ensureTOken ?
     }
 
     /**
