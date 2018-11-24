@@ -2,12 +2,10 @@ package fr.ynov.dap.dap.model;
 
 import java.util.ArrayList;
 
-public class MicrosoftEvent {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-	/**
-	 * Store event id.
-	 */
-	private String id;
+@JsonIgnoreProperties(ignoreUnknown=true)
+public class MicrosoftEvent {
 
 	/**
 	 * Store event subject.
@@ -25,6 +23,11 @@ public class MicrosoftEvent {
 	private DateTimeTimeZone start;
 
 	/**
+	 * Store the status.
+	 */
+	private Status responseStatus;
+
+	/**
 	 * Store ending date.
 	 */
 	private DateTimeTimeZone end;
@@ -33,20 +36,6 @@ public class MicrosoftEvent {
 	 * List of every attendee for current event.
 	 */
 	private ArrayList<MicrosoftAttendee> attendees;
-
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	/**
 	 * @return the subject
@@ -109,6 +98,20 @@ public class MicrosoftEvent {
 	 */
 	public ArrayList<MicrosoftAttendee> getAttendees() {
 		return attendees;
+	}
+
+	/**
+	 * @return the responseStatus
+	 */
+	public Status getResponseStatus() {
+		return responseStatus;
+	}
+
+	/**
+	 * @param responseStatus the responseStatus to set
+	 */
+	public void setResponseStatus(Status responseStatus) {
+		this.responseStatus = responseStatus;
 	}
 
 	/**

@@ -15,14 +15,7 @@ import retrofit2.http.Query;
 
 public interface MicrosoftService {
 
-	/**
-     * Get event paginated.
-     * @param orderBy Order for result
-     * @param filter Filter to apply.
-     * @param select Which information to retrieve.
-     * @param maxResults Number of event per page.
-     * @return List of event
-     */
+	
     @GET("/v1.0/me/events")
     Call<PagedResult<MicrosoftEvent>> getEvents(@Query("$orderby") String orderBy, @Query("$filter") String filter,
             @Query("$select") String select, @Query("$top") Integer maxResults);
