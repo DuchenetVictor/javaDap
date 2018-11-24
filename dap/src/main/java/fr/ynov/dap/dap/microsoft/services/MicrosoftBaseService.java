@@ -169,7 +169,7 @@ abstract class MicrosoftBaseService {
 			microsoftAccount.setAccessToken(tokenResponse.getAccessToken());
 			microsoftAccount.setExpirationDate(tokenResponse.getExpirationTime());
 			microsoftAccount.setRefreshToken(tokenResponse.getRefreshToken());
-			microsoftAccount.setTokenType("il a bien refreseh ^^");
+			microsoftAccount.setTokenType(tokenResponse.getTokenType());
 
 			microsoftAccountRepostory.save(microsoftAccount);
 

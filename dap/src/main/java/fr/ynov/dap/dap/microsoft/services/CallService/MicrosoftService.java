@@ -1,10 +1,13 @@
 package fr.ynov.dap.dap.microsoft.services.CallService;
 
+import javax.xml.ws.RespectBinding;
+
 import fr.ynov.dap.dap.model.MicrosoftContact;
 import fr.ynov.dap.dap.model.MicrosoftEvent;
 import fr.ynov.dap.dap.model.MicrosoftMail;
 import fr.ynov.dap.dap.model.MicrosoftMailFolder;
 import fr.ynov.dap.dap.model.PagedResult;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -56,5 +59,5 @@ public interface MicrosoftService {
 			@Query("$select") String select, @Query("$top") Integer maxResults);
 	
 	@GET("/v1.0/me/contacts/$count")
-	Call<Object> getNbrContact();
+	Call<ResponseBody> getNbrContact();
 }
