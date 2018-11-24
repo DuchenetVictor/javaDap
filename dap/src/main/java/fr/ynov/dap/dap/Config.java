@@ -149,7 +149,7 @@ public class Config {
      * @param msClientSecretFile the microsoftClientSecretFile to set
      */
     public void setMicrosoftClientSecretFile(final String msClientSecretFile) {
-        microsoftClientSecretFile = microsoftClientSecretFile;
+       this.microsoftClientSecretFile = msClientSecretFile;
     }
 
     /**

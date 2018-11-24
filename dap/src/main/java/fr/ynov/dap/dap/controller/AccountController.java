@@ -137,7 +137,7 @@ public class AccountController extends BaseController {
         } else {
             session.setAttribute("error", "Unexpected state returned from authority.");
         }
-        // TODO
+        // TODO : redirecte vers page admin pour montrer token
         return "ok";
     }
 }

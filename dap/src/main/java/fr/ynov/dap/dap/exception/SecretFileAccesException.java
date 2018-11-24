@@ -7,6 +7,11 @@ package fr.ynov.dap.dap.exception;
 public class SecretFileAccesException extends Exception {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * custom exception throws when you try to get the info from the microsoft
      * client'secret file.
      *

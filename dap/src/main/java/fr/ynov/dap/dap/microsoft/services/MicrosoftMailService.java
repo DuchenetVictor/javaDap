@@ -1,34 +1,39 @@
 package fr.ynov.dap.dap.microsoft.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
 
-import fr.ynov.dap.dap.data.AppUserRepostory;
+import org.springframework.stereotype.Service;
+
 import fr.ynov.dap.dap.data.MicrosoftAccount;
-import fr.ynov.dap.dap.microsoft.services.CallService.MailService;
+import fr.ynov.dap.dap.exception.SecretFileAccesException;
+import fr.ynov.dap.dap.model.MicrosoftMail;
+import fr.ynov.dap.dap.model.PagedResult;
 
 /**
  *
  * @author David_tepoche
  *
  */
+@Service
 public class MicrosoftMailService extends MicrosoftBaseService {
 
-    @Autowired
-    private AppUserRepostory appUserRepostory;
+	public int nbrMailUnread(MicrosoftAccount microsoftAccount) throws IOException, SecretFileAccesException {
+		// Generate the token service
+		return getMicrosoftService(microsoftAccount).getFolder("inbox").execute().body().getUnreadItemCount();
+	}
 
-    public int nbrMailUnread(MicrosoftAccount microsoftAccount) {
-        // Generate the token service
-        MicrosoftAccountService.
+	public MicrosoftMail[] getMail(MicrosoftAccount account, int nbrMailToDisplay)
+			throws IOException, SecretFileAccesException {
 
-                MailService mailService = getRetrofit().create(MailService.class);
+		PagedResult<MicrosoftMail> result = getMicrosoftService(account)
+				.getMessages("inbox", null, null, nbrMailToDisplay).execute().body();
+		return result.getValue();
 
-        return 0;
+	}
 
-    }
-
-    @Override
-    protected final String getClassName() {
-        return MicrosoftMailService.class.getName();
-    }
+	@Override
+	protected final String getClassName() {
+		return MicrosoftMailService.class.getName();
+	}
 
 }

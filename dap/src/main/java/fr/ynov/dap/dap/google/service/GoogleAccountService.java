@@ -30,156 +30,156 @@ import fr.ynov.dap.dap.data.AppUserRepostory;
 @Service
 public class GoogleAccountService extends GoogleBaseService {
 
-    /**
-     * link the appUser repository.
-     */
-    @Autowired
-    private AppUserRepostory userAppRepository;
+	/**
+	 * link the appUser repository.
+	 */
+	@Autowired
+	private AppUserRepostory userAppRepository;
 
-    /**
-     * Handle the Google response.
-     *
-     * @param request The HTTP Request
-     * @param code    The (encoded) code use by Google (token, expirationDate,...)
-     * @param session the HTTP Session
-     * @return the view to display
-     * @throws ServletException When Google account could not be connected to DaP.
-     */
+	/**
+	 * Handle the Google response.
+	 *
+	 * @param request The HTTP Request
+	 * @param code    The (encoded) code use by Google (token, expirationDate,...)
+	 * @param session the HTTP Session
+	 * @return the view to display
+	 * @throws ServletException When Google account could not be connected to DaP.
+	 */
 
-    public String oAuthCallback(final String code, final HttpServletRequest request, final HttpSession session)
-            throws ServletException {
-        final String decodedCode = extracCode(request);
+	public String oAuthCallback(final String code, final HttpServletRequest request, final HttpSession session)
+			throws ServletException {
+		final String decodedCode = extracCode(request);
 
-        final String redirectUri = buildRedirectUri(request, getConfig().getoAuth2CallbackUrl());
+		final String redirectUri = buildRedirectUri(request, getConfig().getoAuth2CallbackUrl());
 
-        final String accountName = session.getAttribute("accountName").toString();
-        final String userKey = session.getAttribute("userKey").toString();
-        try {
-            final GoogleAuthorizationCodeFlow flow = super.getFlow();
-            final TokenResponse response = flow.newTokenRequest(decodedCode).setRedirectUri(redirectUri).execute();
+		final String accountName = session.getAttribute("accountName").toString();
+		final String userKey = session.getAttribute("userKey").toString();
+		try {
+			final GoogleAuthorizationCodeFlow flow = super.getFlow();
+			final TokenResponse response = flow.newTokenRequest(decodedCode).setRedirectUri(redirectUri).execute();
 
-            final Credential credential = flow.createAndStoreCredential(response, accountName);
-            if (null == credential || null == credential.getAccessToken()) {
-                getLogger().warn("Trying to store a NULL AccessToken for user : " + accountName);
+			final Credential credential = flow.createAndStoreCredential(response, accountName);
+			if (null == credential || null == credential.getAccessToken()) {
+				getLogger().warn("Trying to store a NULL AccessToken for user : " + accountName);
 
-            }
+			}
 
-            if (getLogger().isDebugEnabled() && null != credential && null != credential.getAccessToken()) {
-                getLogger().debug("New user credential stored with userId : " + accountName + "partial AccessToken : "
-                        + credential.getAccessToken().toString());
+			if (getLogger().isDebugEnabled() && null != credential && null != credential.getAccessToken()) {
+				getLogger().debug("New user credential stored with userId : " + accountName + "partial AccessToken : "
+						+ credential.getAccessToken().toString());
 
-            }
-            // onSuccess(request, resp, credential);
-        } catch (IOException | GeneralSecurityException e) {
-            getLogger().error("Exception while trying to store user Credential", e);
-            throw new ServletException("Error while trying to conenct Google Account");
-        }
+			}
+			// onSuccess(request, resp, credential);
+		} catch (IOException | GeneralSecurityException e) {
+			getLogger().error("Exception while trying to store user Credential", e);
+			throw new ServletException("Error while trying to conenct Google Account");
+		}
 
-        AppUser appUser = userAppRepository.findByUserKey(userKey);
-        fr.ynov.dap.dap.data.GoogleAccount account = new fr.ynov.dap.dap.data.GoogleAccount();
-        account.setAccountName(accountName);
-        appUser.addGoogleAccount(account);
+		AppUser appUser = userAppRepository.findByUserKey(userKey);
+		fr.ynov.dap.dap.data.GoogleAccount account = new fr.ynov.dap.dap.data.GoogleAccount();
+		account.setAccountName(accountName);
+		appUser.addGoogleAccount(account);
+		userAppRepository.save(appUser);
+		return "Vous etes Connecté !";
+	}
 
-        return "Vous etes Connecté !";
-    }
+	/**
+	 * Extract OAuth2 Google code (from URL) and decode it.
+	 *
+	 * @param request the HTTP request to extract OAuth2 code
+	 * @return the decoded code
+	 * @throws ServletException if the code cannot be decoded
+	 */
+	private String extracCode(final HttpServletRequest request) throws ServletException {
+		final StringBuffer buf = request.getRequestURL();
+		if (null != request.getQueryString()) {
+			buf.append('?').append(request.getQueryString());
+		}
+		final AuthorizationCodeResponseUrl responseUrl = new AuthorizationCodeResponseUrl(buf.toString());
+		final String decodeCode = responseUrl.getCode();
 
-    /**
-     * Extract OAuth2 Google code (from URL) and decode it.
-     *
-     * @param request the HTTP request to extract OAuth2 code
-     * @return the decoded code
-     * @throws ServletException if the code cannot be decoded
-     */
-    private String extracCode(final HttpServletRequest request) throws ServletException {
-        final StringBuffer buf = request.getRequestURL();
-        if (null != request.getQueryString()) {
-            buf.append('?').append(request.getQueryString());
-        }
-        final AuthorizationCodeResponseUrl responseUrl = new AuthorizationCodeResponseUrl(buf.toString());
-        final String decodeCode = responseUrl.getCode();
+		if (decodeCode == null) {
+			throw new MissingServletRequestParameterException("code", "String");
+		}
 
-        if (decodeCode == null) {
-            throw new MissingServletRequestParameterException("code", "String");
-        }
+		if (null != responseUrl.getError()) {
+			getLogger().error("Error when trying to add Google acocunt : " + responseUrl.getError());
+			throw new ServletException("Error when trying to add Google acocunt");
+			// onError(request, resp, responseUrl);
+		}
 
-        if (null != responseUrl.getError()) {
-            getLogger().error("Error when trying to add Google acocunt : " + responseUrl.getError());
-            throw new ServletException("Error when trying to add Google acocunt");
-            // onError(request, resp, responseUrl);
-        }
+		return decodeCode;
+	}
 
-        return decodeCode;
-    }
+	/**
+	 * Build a current host (and port) absolute URL.
+	 *
+	 * @param req         The current HTTP request to extract schema, host, port
+	 *                    informations
+	 * @param destination the "path" to the resource
+	 * @return an absolute URI
+	 */
+	protected String buildRedirectUri(final HttpServletRequest req, final String destination) {
+		final GenericUrl url = new GenericUrl(req.getRequestURL().toString());
+		url.setRawPath(destination);
+		return url.build();
+	}
 
-    /**
-     * Build a current host (and port) absolute URL.
-     *
-     * @param req         The current HTTP request to extract schema, host, port
-     *                    informations
-     * @param destination the "path" to the resource
-     * @return an absolute URI
-     */
-    protected String buildRedirectUri(final HttpServletRequest req, final String destination) {
-        final GenericUrl url = new GenericUrl(req.getRequestURL().toString());
-        url.setRawPath(destination);
-        return url.build();
-    }
+	@Override
+	protected final String getClassName() {
+		return GoogleAccountService.class.getName();
+	}
 
-    @Override
-    protected final String getClassName() {
-        return GoogleAccountService.class.getName();
-    }
+	/**
+	 * Add a Google account (user will be prompt to connect and accept required
+	 * access).
+	 *
+	 * @param accountName the user to store Data
+	 * @param request     the HTTP request
+	 * @param userKey     user in Bdd
+	 * @param httpSession dunno.
+	 * @param response    dunno
+	 * @throws GeneralSecurityException dunno.
+	 * @throws IOException              dunno.
+	 */
+	public void addAccount(final String accountName, final String userKey, final HttpServletRequest request,
+			final HttpSession httpSession, final HttpServletResponse response)
+			throws GeneralSecurityException, IOException {
+		Credential credential = null;
+		GoogleAuthorizationCodeFlow flow;
 
-    /**
-     * Add a Google account (user will be prompt to connect and accept required
-     * access).
-     *
-     * @param accountName the user to store Data
-     * @param request     the HTTP request
-     * @param userKey     user in Bdd
-     * @param httpSession dunno.
-     * @param response    dunno
-     * @throws GeneralSecurityException dunno.
-     * @throws IOException              dunno.
-     */
-    public void addAccount(final String accountName, final String userKey, final HttpServletRequest request,
-            final HttpSession httpSession, final HttpServletResponse response)
-            throws GeneralSecurityException, IOException {
-        Credential credential;
-        GoogleAuthorizationCodeFlow flow;
+		if (userAppRepository.findByUserKey(userKey) == null) {
+			getLogger().warn("ajout d'un compte pour un utilisateur non present en bdd: " + userKey);
+			throw new NullPointerException("Utilisateur non present en base de donnée");
+		}
 
-        if (userAppRepository.findByUserKey(userKey) == null) {
-            getLogger().warn("ajout d'un compte pour un utilisateur non present en bdd: " + userKey);
-            throw new NullPointerException("Utilisateur non present en base de donnée");
-        }
+		flow = super.getFlow();
+		credential = flow.loadCredential(accountName);
 
-        flow = super.getFlow();
-        credential = flow.loadCredential(accountName);
+		if (credential != null && credential.getAccessToken() != null) {
+			AppUser appUser = userAppRepository.findByUserKey(userKey);
+			Boolean accountAlreadyAdd = appUser.getgAccounts().stream()
+					.anyMatch(a -> a.getAccountName().equalsIgnoreCase(accountName));
+			if (!accountAlreadyAdd) {
+				fr.ynov.dap.dap.data.GoogleAccount gAccount = new fr.ynov.dap.dap.data.GoogleAccount();
+				gAccount.setAccountName(accountName);
 
-        if (credential != null && credential.getAccessToken() != null) {
-            AppUser appUser = userAppRepository.findByUserKey(userKey);
-            Boolean accountAlreadyAdd = appUser.getgAccounts().stream()
-                    .anyMatch(a -> a.getAccountName().equalsIgnoreCase(accountName));
-            if (!accountAlreadyAdd) {
-                fr.ynov.dap.dap.data.GoogleAccount gAccount = new fr.ynov.dap.dap.data.GoogleAccount();
-                gAccount.setAccountName(accountName);
+				appUser.addGoogleAccount(gAccount);
+				userAppRepository.save(appUser);
+			}
 
-                appUser.addGoogleAccount(gAccount);
-                userAppRepository.save(appUser);
-            }
+		} else {
+			// redirect to the authorization flow
+			final AuthorizationCodeRequestUrl authorizationUrl = flow.newAuthorizationUrl();
+			authorizationUrl.setRedirectUri(buildRedirectUri(request, getConfig().getoAuth2CallbackUrl()));
 
-        } else {
-            // redirect to the authorization flow
-            final AuthorizationCodeRequestUrl authorizationUrl = flow.newAuthorizationUrl();
-            authorizationUrl.setRedirectUri(buildRedirectUri(request, getConfig().getoAuth2CallbackUrl()));
+			// store userKey and accountName in session for CallBack Access
+			httpSession.setAttribute("accountName", accountName);
+			httpSession.setAttribute("userKey", userKey);
 
-            // store userKey and accountName in session for CallBack Access
-            httpSession.setAttribute("accountName", accountName);
-            httpSession.setAttribute("userKey", userKey);
+			response.sendRedirect(authorizationUrl.build());
+		}
 
-            response.sendRedirect(authorizationUrl.build());
-        }
-
-    }
+	}
 
 }

@@ -10,7 +10,7 @@ import com.google.api.services.calendar.model.EventAttendee;
  * @author David_tepoche
  *
  */
-public class CalendarEvent {
+public class GoogleCalendarEvent {
 
     /**
      * subject of the calendar event.
@@ -41,7 +41,7 @@ public class CalendarEvent {
      * @param event            envent from google api response
      * @param emailCurrentUser email of the authenticated user
      */
-    public CalendarEvent(final Event event, final String emailCurrentUser) {
+    public GoogleCalendarEvent(final Event event, final String emailCurrentUser) {
         this.startDate = new Timestamp(event.getStart().getDateTime().getValue());
         this.endDate = new Timestamp(event.getEnd().getDateTime().getValue());
         this.subject = event.getSummary();
@@ -58,7 +58,6 @@ public class CalendarEvent {
      * @return the personnal status
      */
     private String setPersonnalStatus(final Event event, final String email) {
-        String persoStatus;
 
         if (event.getOrganizer() != null && email.equalsIgnoreCase(event.getOrganizer().getEmail())) {
             personnalStatus = "Owner";

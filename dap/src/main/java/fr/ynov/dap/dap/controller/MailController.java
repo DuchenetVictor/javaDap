@@ -13,6 +13,7 @@ import fr.ynov.dap.dap.data.AppUser;
 import fr.ynov.dap.dap.data.AppUserRepostory;
 import fr.ynov.dap.dap.data.GoogleAccount;
 import fr.ynov.dap.dap.data.MicrosoftAccount;
+import fr.ynov.dap.dap.exception.SecretFileAccesException;
 import fr.ynov.dap.dap.google.service.GMailService;
 import fr.ynov.dap.dap.microsoft.services.MicrosoftMailService;
 
@@ -50,10 +51,11 @@ public class MailController extends BaseController {
      * @return number of gmail unread.
      * @throws IOException              throw from gmailService
      * @throws GeneralSecurityException throw from gmailService
+     * @throws SecretFileAccesException 
      */
     @RequestMapping("/nbrunreadmail/{userKey}")
     public @ResponseBody Object getNbrUnreadMail(@PathVariable("userKey") final String userKey)
-            throws GeneralSecurityException, IOException {
+            throws GeneralSecurityException, IOException, SecretFileAccesException {
         Integer nbrEmailUnread = 0;
 
         AppUser appUser = appUserRepository.findByUserKey(userKey);
@@ -66,7 +68,7 @@ public class MailController extends BaseController {
             nbrEmailUnread += gmailService.nbrEmailUnread(account.getAccountName());
         }
         for (MicrosoftAccount account : appUser.getmAccounts()) {
-            nbrEmailUnread += microsoftMailService.nbrMailUnread(account);
+            nbrEmailUnread +=  microsoftMailService.nbrMailUnread(account);
         }
 
         return nbrEmailUnread;
@@ -74,7 +76,6 @@ public class MailController extends BaseController {
 
     @Override
     public final String getClassName() {
-        // TODO Auto-generated method stub
         return MailController.class.getName();
     }
 }

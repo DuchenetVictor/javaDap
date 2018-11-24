@@ -19,7 +19,7 @@ import fr.ynov.dap.dap.data.AppUserRepostory;
 import fr.ynov.dap.dap.data.GoogleAccount;
 import fr.ynov.dap.dap.google.service.CalendarService;
 import fr.ynov.dap.dap.google.service.UserInfoService;
-import fr.ynov.dap.dap.model.CalendarEvent;
+import fr.ynov.dap.dap.model.GoogleCalendarEvent;
 
 /**
  *
@@ -60,7 +60,7 @@ public class CalendarController extends BaseController {
      * @throws NumberFormatException    if the nbrEvent cannot be cast as an integer
      */
     @GetMapping("/getNextEvent/{nbrEnvent}/{userKey}")
-    public @ResponseBody List<CalendarEvent> getNextEvent(@PathVariable(value = "nbrEnvent") final String nbrEvent,
+    public @ResponseBody List<GoogleCalendarEvent> getNextEvent(@PathVariable(value = "nbrEnvent") final String nbrEvent,
             @PathVariable("userKey") final String userKey)
             throws NumberFormatException, IOException, GeneralSecurityException {
 
@@ -70,14 +70,14 @@ public class CalendarController extends BaseController {
             throw new NullPointerException("Utilisateur non present en base de donnée");
         }
 
-        List<CalendarEvent> calendarEvents = new ArrayList<>();
+        List<GoogleCalendarEvent> calendarEvents = new ArrayList<>();
         for (GoogleAccount account : appUser.getgAccounts()) {
             List<Event> lastEvents = calendarService.getLastEvent(Integer.valueOf(nbrEvent), account.getAccountName());
 
             String userEmail = userInfoService.getEmail(account.getAccountName());
 
             for (Event event : lastEvents) {
-                calendarEvents.add(new CalendarEvent(event, userEmail));
+                calendarEvents.add(new GoogleCalendarEvent(event, userEmail));
             }
         }
         return calendarEvents;

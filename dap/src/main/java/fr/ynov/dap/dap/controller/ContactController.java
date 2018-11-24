@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.ynov.dap.dap.data.AppUser;
 import fr.ynov.dap.dap.data.AppUserRepostory;
 import fr.ynov.dap.dap.data.GoogleAccount;
+import fr.ynov.dap.dap.data.MicrosoftAccount;
+import fr.ynov.dap.dap.exception.SecretFileAccesException;
 import fr.ynov.dap.dap.google.service.ContactService;
+import fr.ynov.dap.dap.microsoft.services.MicrosoftContactService;
 
 /**
  *
@@ -24,48 +27,57 @@ import fr.ynov.dap.dap.google.service.ContactService;
 @RequestMapping("/contact")
 public class ContactController extends BaseController {
 
-    /**
-     * link with contactService.
-     */
-    @Autowired
-    private ContactService contactService;
+	/**
+	 * link with contactService.
+	 */
+	@Autowired
+	private ContactService contactService;
 
-    /**
-     * link appUser repository.
-     */
-    @Autowired
-    private AppUserRepostory appUserRepository;
+	@Autowired
+	private MicrosoftContactService microsoftContactService;
 
-    /**
-     * get the number of contact from userId.
-     *
-     * @param userKey user token
-     * @return number of contact
-     * @throws GeneralSecurityException throw if the contactService fail
-     * @throws IOException              throw if the contactService fail
-     */
-    @GetMapping("/nbrContact/{userKey}")
-    public @ResponseBody Integer nbrOfContact(@PathVariable("userKey") final String userKey)
-            throws IOException, GeneralSecurityException {
+	/**
+	 * link appUser repository.
+	 */
+	@Autowired
+	private AppUserRepostory appUserRepository;
 
-        AppUser appUser = appUserRepository.findByUserKey(userKey);
-        if (appUser == null) {
-            getLogger().warn("Utilisateur non present en bdd: " + userKey);
-            throw new NullPointerException("Utilisateur non present en base de donnée");
-        }
-        Integer nbrContact = 0;
-        for (GoogleAccount account : appUser.getgAccounts()) {
-            nbrContact += contactService.getNbrContact(account.getAccountName());
-        }
-        return nbrContact;
-    }
+	/**
+	 * get the number of contact from userId.
+	 *
+	 * @param userKey user token
+	 * @return number of contact
+	 * @throws GeneralSecurityException throw if the contactService fail
+	 * @throws IOException              throw if the contactService fail
+	 * @throws SecretFileAccesException 
+	 */
+	@GetMapping("/nbrContact/{userKey}")
+	public @ResponseBody Integer nbrOfContact(@PathVariable("userKey") final String userKey)
+			throws IOException, GeneralSecurityException, SecretFileAccesException {
 
-    /**
-     * return the name of the current class.
-     */
-    @Override
-    public String getClassName() {
-        return ContactController.class.getName();
-    }
+		AppUser appUser = appUserRepository.findByUserKey(userKey);
+		if (appUser == null) {
+			getLogger().warn("Utilisateur non present en bdd: " + userKey);
+			throw new NullPointerException("Utilisateur non present en base de donnée");
+		}
+		
+		Integer nbrContact = 0;
+		
+		for (GoogleAccount account : appUser.getgAccounts()) {
+			nbrContact += contactService.getNbrContact(account.getAccountName());
+		}
+		for (MicrosoftAccount account : appUser.getmAccounts()) {
+			nbrContact += microsoftContactService.getNbrContact(account);
+		}
+		return nbrContact;
+	}
+
+	/**
+	 * return the name of the current class.
+	 */
+	@Override
+	public String getClassName() {
+		return ContactController.class.getName();
+	}
 
 }

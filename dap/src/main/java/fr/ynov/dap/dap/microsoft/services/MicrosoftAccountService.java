@@ -12,13 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import fr.ynov.dap.dap.model.TokenResponse;
-
-import fr.ynov.dap.dap.exception.SecretFileAccesException;
-import fr.ynov.dap.dap.microsoft.services.CallService.TokenService;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import fr.ynov.dap.dap.exception.SecretFileAccesException;
+import fr.ynov.dap.dap.microsoft.services.CallService.TokenService;
 import fr.ynov.dap.dap.data.AppUser;
 import fr.ynov.dap.dap.data.AppUserRepostory;
 import fr.ynov.dap.dap.data.MicrosoftAccount;
@@ -48,16 +47,20 @@ public class MicrosoftAccountService extends MicrosoftBaseService {
     public TokenResponse getTokenFromAuthCode(final String authCode, final String tenantId)
             throws SecretFileAccesException {
 
-        // Generate the token service
-        TokenService tokenService = getRetrofit().create(TokenService.class);
+    	 HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
+         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+         // Create and configure the Retrofit object
+         Retrofit retrofit = new Retrofit.Builder().baseUrl(getConfig().getMicrosoftAuthorityUrl()).client(client)
+                 .addConverterFactory(JacksonConverterFactory.create()).build();
+
+         // Generate the token service
+         TokenService tokenService = retrofit.create(TokenService.class);
         try {
-            TokenResponse tokenResponse = tokenService.getAccessTokenFromAuthCode(tenantId, getAppId(),
+            return tokenService.getAccessTokenFromAuthCode(tenantId, getAppId(),
                     getAppPassword(), "authorization_code", authCode, getRedirectUrl()).execute().body();
-
-            return ensureTokens(tokenResponse.getExpirationTime(), tokenResponse.getRefreshToken(),
-                    tokenResponse.getAccessToken(), tenantId);
-
         } catch (IOException e) {
             getLogger().error("Probleme lors de la recuperation du token", e);
             TokenResponse error = new TokenResponse();
@@ -119,16 +122,6 @@ public class MicrosoftAccountService extends MicrosoftBaseService {
                 .filter(ma -> ma.getAccountName().equalsIgnoreCase(accountName)).findFirst().orElse(null);
         if (microsoftAccount != null) {
             getLogger().warn("Ajout d'un utilistaeur deja present en Bdd: " + microsoftAccount.getAccountName());
-
-            TokenResponse tokenResponse = ensureTokens(microsoftAccount.getExpirationDate(),
-                    microsoftAccount.getRefreshToken(), microsoftAccount.getAccessToken(),
-                    microsoftAccount.getTenantId());
-            microsoftAccount.setAccessToken(tokenResponse.getAccessToken());
-            microsoftAccount.setExpirationDate(tokenResponse.getExpiresIn());
-            microsoftAccount.setTokenType(tokenResponse.getTokenType());
-            microsoftAccount.setRefreshToken(tokenResponse.getRefreshToken());
-
-            appUserRepostory.save(appUser);
         } else {
             session.setAttribute("accountName", accountName);
             session.setAttribute("userKey", userKey);

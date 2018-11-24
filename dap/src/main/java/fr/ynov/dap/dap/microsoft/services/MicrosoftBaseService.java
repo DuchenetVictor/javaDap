@@ -14,8 +14,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.api.client.auth.oauth2.TokenErrorResponse;
+
 import fr.ynov.dap.dap.Config;
+import fr.ynov.dap.dap.data.AppUser;
+import fr.ynov.dap.dap.data.AppUserRepostory;
+import fr.ynov.dap.dap.data.MicrosoftAccount;
+import fr.ynov.dap.dap.data.MicrosoftAccountRepostory;
 import fr.ynov.dap.dap.exception.SecretFileAccesException;
+import fr.ynov.dap.dap.microsoft.services.CallService.MicrosoftService;
 import fr.ynov.dap.dap.microsoft.services.CallService.TokenService;
 import fr.ynov.dap.dap.model.TokenResponse;
 import okhttp3.Interceptor;
@@ -33,204 +40,219 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
  */
 abstract class MicrosoftBaseService {
 
-    /**
-     * the name of the properties in file.
-     */
-    private static final String REDIRECT_URL = "redirectUrl";
+	/**
+	 * the name of the properties in file.
+	 */
+	private static final String REDIRECT_URL = "redirectUrl";
 
-    /**
-     * the name of the properties in file.
-     */
-    private static final String APP_PASSWORD = "appPassword";
+	/**
+	 * the name of the properties in file.
+	 */
+	private static final String APP_PASSWORD = "appPassword";
 
-    /**
-     * the name of the properties in file.
-     */
-    private static final String APP_ID = "appId";
+	/**
+	 * the name of the properties in file.
+	 */
+	private static final String APP_ID = "appId";
 
-    /**
-     * link the config.
-     */
-    @Autowired
-    private Config config;
+	/**
+	 * link the config.
+	 */
+	@Autowired
+	private Config config;
 
-    /**
-     * stock the instance,it is not usefull to read each time the client'secret
-     * file.
-     */
-    private static Properties clientProperties;
+	@Autowired
+	private MicrosoftAccountRepostory microsoftAccountRepostory;
 
-    /**
-     * Initialize the logger.
-     */
-    private Logger logger = LogManager.getLogger(getClassName());
+	/**
+	 * stock the instance,it is not usefull to read each time the client'secret
+	 * file.
+	 */
+	private static Properties clientProperties;
 
-    /**
-     * list of all the scope required for the appli.
-     */
-    private static final List<String> SCOPES = Arrays.asList("openid", "offline_access", "profile", "User.Read",
-            "Mail.Read");
+	/**
+	 * Initialize the logger.
+	 */
+	private Logger logger = LogManager.getLogger(getClassName());
 
-    /**
-     * get the name of the class.
-     *
-     * @return the name of the class
-     */
-    protected abstract String getClassName();
+	/**
+	 * list of all the scope required for the appli.
+	 */
+	private static final List<String> SCOPES = Arrays.asList("openid", "offline_access", "profile", "User.Read",
+			"Mail.Read", "Calendars.Read", "Contacts.Read");
 
-    /**
-     * @return the scopes
-     */
-    protected static String getScopes() {
-        StringBuilder sb = new StringBuilder();
-        for (String scope : SCOPES) {
-            sb.append(scope + " ");
-        }
-        return sb.toString().trim();
-    }
+	/**
+	 * get the name of the class.
+	 *
+	 * @return the name of the class
+	 */
+	protected abstract String getClassName();
 
-    /**
-     * @return the config
-     */
-    protected Config getConfig() {
-        return config;
-    }
+	/**
+	 * @return the scopes
+	 */
+	protected static String getScopes() {
+		StringBuilder sb = new StringBuilder();
+		for (String scope : SCOPES) {
+			sb.append(scope + " ");
+		}
+		return sb.toString().trim();
+	}
 
-    /**
-     * get properties from microsoft properties client' secret.
-     *
-     * @return Porperties with all the info from the file with the client'secret
-     * @throws SecretFileAccesException dunno.
-     */
-    private Properties getClientProperties() throws SecretFileAccesException {
-        if (clientProperties == null) {
-            clientProperties = new Properties();
-            try (FileInputStream istreamClientSecretFile = new FileInputStream(
-                    config.getDataStoreDirectory() + File.separator + config.getMicrosoftClientSecretFile())) {
-                if (istreamClientSecretFile != null) {
-                    clientProperties.load(istreamClientSecretFile);
-                }
-            } catch (IOException e) {
-                throw new SecretFileAccesException(e);
-            }
-        }
-        return clientProperties;
-    }
+	/**
+	 * @return the config
+	 */
+	protected Config getConfig() {
+		return config;
+	}
 
-    /**
-     * dunno .
-     *
-     * @param expirationDate dunno
-     * @param refreshToken   dunno
-     * @param accesToken     dunno
-     * @param tenantId       dunno
-     * @return dunno
-     * @throws IOException              dunno
-     * @throws SecretFileAccesException dunno
-     */
-    public TokenResponse ensureTokens(final Date expirationDate, final String refreshToken, final String accesToken,
-            final String tenantId) throws IOException, SecretFileAccesException {
-        // Are tokens still valid?
-        Calendar now = Calendar.getInstance();
-        if (now.getTime().before(expirationDate)) {
-            // Still valid, return them as-is
-            TokenResponse tokens = new TokenResponse();
-            tokens.setAccessToken(accesToken);
+	/**
+	 * get properties from microsoft properties client' secret.
+	 *
+	 * @return Porperties with all the info from the file with the client'secret
+	 * @throws SecretFileAccesException dunno.
+	 */
+	private Properties getClientProperties() throws SecretFileAccesException {
+		if (clientProperties == null) {
+			clientProperties = new Properties();
+			try (FileInputStream istreamClientSecretFile = new FileInputStream(
+					config.getDataStoreDirectory() + File.separator + config.getMicrosoftClientSecretFile())) {
+				if (istreamClientSecretFile != null) {
+					clientProperties.load(istreamClientSecretFile);
+				}
+			} catch (IOException e) {
+				throw new SecretFileAccesException(e);
+			}
+		}
+		return clientProperties;
+	}
 
-            tokens.setExpirationTime(expirationDate);
-            tokens.setRefreshToken(refreshToken);
-            return tokens;
-        } else {
-            // Expired, refresh the tokens
-            // Create a logging interceptor to log request and responses
-            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+	/**
+	 * dunno .
+	 *
+	 * @param expirationDate dunno
+	 * @param refreshToken   dunno
+	 * @param accesToken     dunno
+	 * @param tenantId       dunno
+	 * @return dunno
+	 * @throws IOException              dunno
+	 * @throws SecretFileAccesException dunno
+	 */
+	public void ensureTokens(final MicrosoftAccount microsoftAccount) throws IOException, SecretFileAccesException {
 
-            OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+		// Are tokens still valid?
+		Date expirationDate = microsoftAccount.getExpirationDate();
+		String accessToken = microsoftAccount.getAccessToken();
+		String refreshToken = microsoftAccount.getRefreshToken();
 
-            // Create and configure the Retrofit object
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(getConfig().getMicrosoftAuthorityUrl()).client(client)
-                    .addConverterFactory(JacksonConverterFactory.create()).build();
+		Calendar now = Calendar.getInstance();
+		if (now.getTime().before(expirationDate)) {
+			// Still valid, return them as-is
+		} else {
+			// Expired, refresh the tokens
+			// Create a logging interceptor to log request and responses
+			HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+			interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-            // Generate the token service
-            TokenService tokenService = retrofit.create(TokenService.class);
+			OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-            return tokenService.getAccessTokenFromRefreshToken(tenantId, getAppId(), getAppPassword(), "refresh_token",
-                    refreshToken, getRedirectUrl()).execute().body();
-        }
-    }
+			// Create and configure the Retrofit object
+			Retrofit retrofit = new Retrofit.Builder().baseUrl(getConfig().getMicrosoftAuthorityUrl()).client(client)
+					.addConverterFactory(JacksonConverterFactory.create()).build();
 
-    /**
-     * dunno.
-     *
-     * @param accessToken dunno
-     * @return dunno
-     */
-    protected Retrofit getRetrofit(final String accessToken) {
-        // Create a logging interceptor to log request and responses
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+			// Generate the token service
+			TokenService tokenService = retrofit.create(TokenService.class);
 
-        Interceptor requestInterceptor = new Interceptor() {
-            @Override
-            public Response intercept(final Interceptor.Chain chain) throws IOException {
-                Request original = chain.request();
-                okhttp3.Request.Builder builder = original.newBuilder().header("User-Agent", "java-tutorial")
-                        .header("client-request-id", UUID.randomUUID().toString())
-                        .header("return-client-request-id", "true")
-                        .header("Authorization", String.format("Bearer %s", accessToken))
-                        .method(original.method(), original.body());
+			TokenResponse tokenResponse = tokenService.getAccessTokenFromRefreshToken(microsoftAccount.getTenantId(),
+					getAppId(), getAppPassword(), "refresh_token", refreshToken, getRedirectUrl()).execute().body();
 
-                Request request = builder.build();
-                return chain.proceed(request);
-            }
-        };
+			microsoftAccount.setAccessToken(tokenResponse.getAccessToken());
+			microsoftAccount.setExpirationDate(tokenResponse.getExpirationTime());
+			microsoftAccount.setRefreshToken(tokenResponse.getRefreshToken());
+			microsoftAccount.setTokenType("il a bien refreseh ^^");
 
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+			microsoftAccountRepostory.save(microsoftAccount);
 
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(requestInterceptor).addInterceptor(interceptor)
-                .build();
+		}
 
-        // Create and configure the Retrofit object
-        return new Retrofit.Builder().baseUrl(config.getMicrosoftAuthorityUrl()).client(client)
-                .addConverterFactory(JacksonConverterFactory.create()).build();
+	}
 
-        // TODO mettre le ensureTOken ?
-    }
+	
+	/**
+	 * dunno.
+	 *
+	 * @param accessToken dunno
+	 * @return dunno
+	 * @throws SecretFileAccesException
+	 * @throws IOException
+	 */
+	protected MicrosoftService getMicrosoftService(final MicrosoftAccount microsoftAccount) throws IOException, SecretFileAccesException {
 
-    /**
-     * dunno.
-     *
-     * @return redirect url from client'secret file
-     * @throws SecretFileAccesException dunno
-     */
-    protected String getRedirectUrl() throws SecretFileAccesException {
-        return getClientProperties().getProperty(REDIRECT_URL);
-    }
+		ensureTokens(microsoftAccount);
 
-    /**
-     * dunno.
-     *
-     * @return password from client'secret file
-     * @throws SecretFileAccesException dunno
-     */
-    protected String getAppPassword() throws SecretFileAccesException {
-        return getClientProperties().getProperty(APP_PASSWORD);
-    }
+		// Create a logging interceptor to log request and responses
+		HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
 
-    /**
-     * dunno.
-     *
-     * @return app id from client'secret file
-     * @throws SecretFileAccesException dunno
-     */
-    protected String getAppId() throws SecretFileAccesException {
-        return getClientProperties().getProperty(APP_ID);
-    }
+		Interceptor requestInterceptor = new Interceptor() {
+			@Override
+			public Response intercept(final Interceptor.Chain chain) throws IOException {
+				Request original = chain.request();
+				Request request = original.newBuilder().header("User-Agent", "java-tutorial")
+						.header("client-request-id", UUID.randomUUID().toString())
+						.header("return-client-request-id", "true")
+						.header("Authorization", String.format("Bearer %s", microsoftAccount.getAccessToken()))
+						.method(original.method(), original.body()).build();
 
-    /**
-     * @return the logger
-     */
-    protected Logger getLogger() {
-        return logger;
-    }
+				return chain.proceed(request);
+			}
+		};
+
+		interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+		OkHttpClient client = new OkHttpClient.Builder().addInterceptor(requestInterceptor).addInterceptor(interceptor)
+				.build();
+
+		// Create and configure the Retrofit object
+		Retrofit retrofit = new Retrofit.Builder().baseUrl("https://graph.microsoft.com").client(client)
+				.addConverterFactory(JacksonConverterFactory.create()).build();
+		return retrofit.create(MicrosoftService.class);
+
+	}
+
+	/**
+	 * dunno.
+	 *
+	 * @return redirect url from client'secret file
+	 * @throws SecretFileAccesException dunno
+	 */
+	protected String getRedirectUrl() throws SecretFileAccesException {
+		return getClientProperties().getProperty(REDIRECT_URL);
+	}
+
+	/**
+	 * dunno.
+	 *
+	 * @return password from client'secret file
+	 * @throws SecretFileAccesException dunno
+	 */
+	protected String getAppPassword() throws SecretFileAccesException {
+		return getClientProperties().getProperty(APP_PASSWORD);
+	}
+
+	/**
+	 * dunno.
+	 *
+	 * @return app id from client'secret file
+	 * @throws SecretFileAccesException dunno
+	 */
+	protected String getAppId() throws SecretFileAccesException {
+		return getClientProperties().getProperty(APP_ID);
+	}
+
+	/**
+	 * @return the logger
+	 */
+	protected Logger getLogger() {
+		return logger;
+	}
 }
