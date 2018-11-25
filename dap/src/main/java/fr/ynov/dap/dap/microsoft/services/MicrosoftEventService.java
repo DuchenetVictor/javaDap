@@ -15,8 +15,7 @@ public class MicrosoftEventService extends MicrosoftBaseService{
 
 	public MicrosoftEvent[] getEvent(final MicrosoftAccount  microsoftAccount, String dateFrom, Integer maxResult) throws IOException, SecretFileAccesException {
 		
-		PagedResult<MicrosoftEvent> pagedResult = getMicrosoftService(microsoftAccount).getEvents("start/dateTime DESC", "start/dateTime  GE '"+dateFrom +"'", null, null).execute().body();
-		return pagedResult.getValue();
+		return getMicrosoftService(microsoftAccount).getEvents("start/dateTime DESC", "start/dateTime  GE '"+dateFrom +"'", null, maxResult).execute().body().getValue();
 	}
 	
 	@Override

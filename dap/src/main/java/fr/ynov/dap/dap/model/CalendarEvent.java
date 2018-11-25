@@ -1,6 +1,8 @@
 package fr.ynov.dap.dap.model;
 
 import java.sql.Timestamp;
+import java.util.Comparator;
+import java.util.Date;
 
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
@@ -10,7 +12,7 @@ import com.google.api.services.calendar.model.EventAttendee;
  * @author David_tepoche
  *
  */
-public class CalendarEvent {
+public class CalendarEvent /* implements Comparable<CalendarEvent>*/ {
 
 	/**
 	 * subject of the calendar event.
@@ -165,5 +167,20 @@ public class CalendarEvent {
 	public void setStatus(final String statusGiven) {
 		this.status = statusGiven;
 	}
+
+//
+//	@Override
+//	public int compareTo(CalendarEvent o) {
+//		if(this.getStartDate().after(o.getStartDate()) {
+//			
+//		}else if(this.getStartDate().before(o.getStartDate())) {
+//			
+//		}else {
+//			
+//		}
+//		return 0;
+//	}
+//	
+	
 
 }

@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
+import com.mysql.fabric.xmlrpc.base.Array;
 
 import fr.ynov.dap.dap.data.AppUser;
 import fr.ynov.dap.dap.data.AppUserRepostory;
@@ -27,6 +29,7 @@ import fr.ynov.dap.dap.data.MicrosoftAccount;
 import fr.ynov.dap.dap.exception.SecretFileAccesException;
 import fr.ynov.dap.dap.google.service.CalendarService;
 import fr.ynov.dap.dap.google.service.UserInfoService;
+import fr.ynov.dap.dap.microsoft.services.MicrosoftAccountService;
 import fr.ynov.dap.dap.microsoft.services.MicrosoftEventService;
 import fr.ynov.dap.dap.microsoft.services.CallService.MicrosoftService;
 import fr.ynov.dap.dap.model.CalendarEvent;
@@ -49,6 +52,9 @@ public class CalendarController extends BaseController {
 
 	@Autowired
 	private MicrosoftEventService microsoftEventService;
+	
+	@Autowired
+	private MicrosoftAccountService microsoftAccountService;
 
 	/**
 	 * link the UserinfoService.
@@ -98,25 +104,27 @@ public class CalendarController extends BaseController {
 			}
 		}
 
+		String dateNowFormatedAndUTC = getUTCDateNowformated();
 		for (MicrosoftAccount account : appUser.getmAccounts()) {
-			SimpleDateFormat dateFormatUTC = new SimpleDateFormat("yyyy-MM-dd");
-			dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-			
-			MicrosoftEvent[] events = microsoftEventService.getEvent(account, dateFormatUTC.format(new Date()), nbEventToDisplay);
+			MicrosoftEvent[] events = microsoftEventService.getEvent(account, dateNowFormatedAndUTC, nbEventToDisplay);
+			String email = microsoftAccountService.getUserEmail(account);
 			for (MicrosoftEvent event : events) {
-
-				calendarEvents.add(new CalendarEvent(event, ""));
+				calendarEvents.add(new CalendarEvent(event, email));
 			}
 		}
+
+		calendarEvents.sort((a, b) -> a.getStartDate().compareTo(b.getStartDate()));
 
 		return calendarEvents;
 	}
 
-	/***
-	 * les trier pare date faire un truc pour eviter le trop gros nbeventToDisplay
-	 * 
-	 */
+	private String getUTCDateNowformated() {
+		SimpleDateFormat dateFormatUTC = new SimpleDateFormat("yyyy-MM-dd");
+		dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+		String dateNowFormatedAndUTC = dateFormatUTC.format(new Date());
+		return dateNowFormatedAndUTC;
+	}
 
 	@Override
 	public final String getClassName() {

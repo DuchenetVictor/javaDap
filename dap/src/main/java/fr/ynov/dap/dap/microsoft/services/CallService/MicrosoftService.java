@@ -1,11 +1,11 @@
 package fr.ynov.dap.dap.microsoft.services.CallService;
 
-import javax.xml.ws.RespectBinding;
 
 import fr.ynov.dap.dap.model.MicrosoftContact;
 import fr.ynov.dap.dap.model.MicrosoftEvent;
 import fr.ynov.dap.dap.model.MicrosoftMail;
 import fr.ynov.dap.dap.model.MicrosoftMailFolder;
+import fr.ynov.dap.dap.model.MicrosoftUserDetail;
 import fr.ynov.dap.dap.model.PagedResult;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -51,6 +51,18 @@ public interface MicrosoftService {
 	Call<PagedResult<MicrosoftMail>> getMessages(@Path("folderid") String folderId, @Query("$orderby") String orderBy,
 			@Query("$select") String select, @Query("$top") Integer maxResults);
 	
+	/**
+	 * dunno
+	 * @return
+	 */
 	@GET("/v1.0/me/contacts/$count")
 	Call<ResponseBody> getNbrContact();
+	
+	/**
+	 * get the details of the current user.
+	 * @return info of the user
+	 */
+	@GET("https://graph.microsoft.com/v1.0/me/")
+	Call<MicrosoftUserDetail> getUserDetails();
+	
 }
