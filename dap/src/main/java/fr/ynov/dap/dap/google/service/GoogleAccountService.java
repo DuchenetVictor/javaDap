@@ -80,7 +80,7 @@ public class GoogleAccountService extends GoogleBaseService {
 		account.setAccountName(accountName);
 		appUser.addGoogleAccount(account);
 		userAppRepository.save(appUser);
-		return "Vous etes Connecté !";
+		return "mainPage";
 	}
 
 	/**

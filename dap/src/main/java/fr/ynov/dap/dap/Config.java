@@ -1,169 +1,134 @@
 package fr.ynov.dap.dap;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+
 /**
  *
  * @author David_tepoche
  *
  */
+@Configuration
+@PropertySource("classpath:config.properties")
 public class Config {
-    /**
-     * name of the application.
-     */
-    private static final String APPLICATION_NAME = "YnovDaP";
-    /**
-     * folder's name of the credentials.
-     */
-    private static final String CREDENTIALS_FOLDER_NAME = "token";
-    /**
-     * file's name of the for the google client' secret.
-     */
-    private static final String GOOGLE_SECRETS_CLIENT_FILE_NAME = "credentials.json";
-    /**
-     * file's name for microsoft client' secret.
-     */
-    private static final String MICROSOFT_SECRETS_CLIENT_FILE_NAME = "auth.properties";
-    /**
-     * root of the redirect url.
-     */
-    private static final String GOOGLE_ROOT_URL_REDIRECT = "/oAuth2Callback";
-    /**
-     * microsoft authority'url to login.
-     */
-    private static final String MICROSOFT_AUTHORITY_URL = "https://login.microsoftonline.com/";
-    /**
-     * url of the microsft redirect.
-     */
-    private static final String MICROSOFT_ROOT_URL_REDIRECT = "common/oauth2/v2.0/authorize";
 
-    /**
-     * store the oAuth2CallbackUrl.
-     */
-    private String googleRootUrlCallBack = GOOGLE_ROOT_URL_REDIRECT;
-    /**
-     * store the oAuth2CallbackUrl.
-     */
-    private String microsoftUrlCallBack = MICROSOFT_ROOT_URL_REDIRECT;
-    /**
-    *
-    */
-    private String microsoftClientSecretFile = MICROSOFT_SECRETS_CLIENT_FILE_NAME;
-    /**
-     * dunno.
-     */
-    private String microsoftAuthorityUrl = MICROSOFT_AUTHORITY_URL;
-    /**
-    *
-    */
-    private String googleClientSecretFile = GOOGLE_SECRETS_CLIENT_FILE_NAME;
-    /**
-    *
-    */
-    private String applicationName = APPLICATION_NAME;
-    /**
-    *
-    */
-    private String credentialsFolder = CREDENTIALS_FOLDER_NAME;
-    /**
-     * get the directory of the dataStore default = the home directory of the user.
-     */
-    private String dataStoreDirectory = System.getProperty("user.home");
+	/**
+	 * store the oAuth2CallbackUrl.
+	 */
+	@Value("${google.root.url.redirect}")
+	private String googleRootUrlCallBack;
+	/**
+	 * store the oAuth2CallbackUrl.
+	 */
+	@Value("${microsoft.root.url.redirect}")
+	private String microsoftUrlCallBack;
 
-    /**
-    *
-    */
-    public Config() {
-    }
+	/**
+	 * dunno.
+	 */
+	@Value("${microsoft.authority.url}")
+	private String microsoftAuthorityUrl;
+	/**
+	*
+	*/
+	@Value("${google.secret.file.name}")
+	private String googleClientSecretFile;
+	/**
+	*
+	*/
+	@Value("${microsoft.secret.file.name}")
+	private String microsoftClientSecretFile;
+	/**
+	*
+	*/
+	@Value("${application.name}")
+	private String applicationName;
+	/**
+	*
+	*/
+	@Value("${google.credential.folder.name}")
+	private String credentialsFolder;
+	/**
+	 * get the directory of the dataStore default = the home directory of the user.
+	 */
+	private String dataStoreDirectory = System.getProperty("user.home");
 
-    /**
-     * @return the microsoftAuthorityUrl
-     */
-    public String getMicrosoftAuthorityUrl() {
-        return microsoftAuthorityUrl;
-    }
+	/**
+	*
+	*/
+	public Config() {
+	}
 
-    /**
-     * @param msAuthorityUrl the microsoftAuthorityUrl to set
-     */
-    public void setMicrosoftAuthorityUrl(final String msAuthorityUrl) {
-        this.microsoftAuthorityUrl = msAuthorityUrl;
-    }
+	/**
+	 * @return the microsoftAuthorityUrl
+	 */
+	public String getMicrosoftAuthorityUrl() {
+		return microsoftAuthorityUrl;
+	}
 
-    /**
-     * @return the oAuth2CallbackUrl
-     */
-    public String getoAuth2CallbackUrl() {
-        return googleRootUrlCallBack;
-    }
+	/**
+	 * @param msAuthorityUrl the microsoftAuthorityUrl to set
+	 */
+	public void setMicrosoftAuthorityUrl(final String msAuthorityUrl) {
+		this.microsoftAuthorityUrl = msAuthorityUrl;
+	}
 
-    /**
-     *
-     * @param dataDirectory the path of the new directory to store the credential
-     */
-    public Config(final String dataDirectory) {
-        this.dataStoreDirectory = dataDirectory;
-    }
+	/**
+	 * @return the oAuth2CallbackUrl
+	 */
+	public String getoAuth2CallbackUrl() {
+		return googleRootUrlCallBack;
+	}
 
-    /**
-     * @return the dataStoreDirectory
-     */
-    public String getDataStoreDirectory() {
-        return this.dataStoreDirectory;
-    }
+	/**
+	 *
+	 * @param dataDirectory the path of the new directory to store the credential
+	 */
+	public Config(final String dataDirectory) {
+		this.dataStoreDirectory = dataDirectory;
+	}
 
-    /**
-     * @param dataDirectory the dataStoreDirectory to set
-     */
-    public void setDataStoreDirectory(final String dataDirectory) {
-        this.dataStoreDirectory = dataDirectory;
-    }
+	/**
+	 * @return the dataStoreDirectory
+	 */
+	public String getDataStoreDirectory() {
+		return this.dataStoreDirectory;
+	}
 
-    /**
-     * @return the credentialsFolder
-     */
-    public String getCredentialsFolder() {
-        return credentialsFolder;
-    }
+	/**
+	 * @return the credentialsFolder
+	 */
+	public String getCredentialsFolder() {
+		return credentialsFolder;
+	}
 
-    /**
-     * @return the microsoftClientSecretFile
-     */
-    public String getMicrosoftClientSecretFile() {
-        return microsoftClientSecretFile;
-    }
+	/**
+	 * @return the microsoftClientSecretFile
+	 */
+	public String getMicrosoftClientSecretFile() {
+		return microsoftClientSecretFile;
+	}
 
-    /**
-     * @return the microsoftRootUrlCallBack
-     */
-    public String getMicrosoftRootUrlCallBack() {
-        return microsoftUrlCallBack;
-    }
+	/**
+	 * @return the microsoftRootUrlCallBack
+	 */
+	public String getMicrosoftRootUrlCallBack() {
+		return microsoftUrlCallBack;
+	}
 
-    /**
-     * @param msUrlCallBack the microsoftRootUrlCallBack to set
-     */
-    public void setMicrosoftUrlCallBack(final String msUrlCallBack) {
-        this.microsoftUrlCallBack = msUrlCallBack;
-    }
+	/**
+	 * @return the clientSecretDir
+	 */
+	public String getGoogleClientSecretFile() {
+		return this.googleClientSecretFile;
+	}
 
-    /**
-     * @param msClientSecretFile the microsoftClientSecretFile to set
-     */
-    public void setMicrosoftClientSecretFile(final String msClientSecretFile) {
-       this.microsoftClientSecretFile = msClientSecretFile;
-    }
-
-    /**
-     * @return the clientSecretDir
-     */
-    public String getGoogleClientSecretFile() {
-        return this.googleClientSecretFile;
-    }
-
-    /**
-     * @return the applicationName
-     */
-    public String getApplicationName() {
-        return this.applicationName;
-    }
+	/**
+	 * @return the applicationName
+	 */
+	public String getApplicationName() {
+		return this.applicationName;
+	}
 
 }

@@ -14,11 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.api.client.auth.oauth2.TokenErrorResponse;
-
 import fr.ynov.dap.dap.Config;
-import fr.ynov.dap.dap.data.AppUser;
-import fr.ynov.dap.dap.data.AppUserRepostory;
 import fr.ynov.dap.dap.data.MicrosoftAccount;
 import fr.ynov.dap.dap.data.MicrosoftAccountRepostory;
 import fr.ynov.dap.dap.exception.SecretFileAccesException;
@@ -142,13 +138,10 @@ abstract class MicrosoftBaseService {
 
 		// Are tokens still valid?
 		Date expirationDate = microsoftAccount.getExpirationDate();
-		String accessToken = microsoftAccount.getAccessToken();
 		String refreshToken = microsoftAccount.getRefreshToken();
 
 		Calendar now = Calendar.getInstance();
-		if (now.getTime().before(expirationDate)) {
-			// Still valid, return them as-is
-		} else {
+		if (now.getTime().after(expirationDate)) {
 			// Expired, refresh the tokens
 			// Create a logging interceptor to log request and responses
 			HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();

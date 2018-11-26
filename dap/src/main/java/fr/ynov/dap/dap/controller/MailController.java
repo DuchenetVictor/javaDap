@@ -43,6 +43,7 @@ public class MailController extends BaseController {
      */
     @Autowired
     private AppUserRepostory appUserRepository;
+    
 
     /**
      * get the number of mail unread.

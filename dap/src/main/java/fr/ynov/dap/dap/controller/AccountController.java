@@ -138,6 +138,6 @@ public class AccountController extends BaseController {
             session.setAttribute("error", "Unexpected state returned from authority.");
         }
         // TODO : redirecte vers page admin pour montrer token
-        return "ok";
+        return "mainPage";
     }
 }
