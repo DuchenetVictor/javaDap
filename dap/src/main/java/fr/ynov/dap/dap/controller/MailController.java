@@ -27,13 +27,13 @@ import fr.ynov.dap.dap.microsoft.services.MicrosoftMailService;
 public class MailController extends BaseController {
 
     /**
-     * dunno.
+     * link the google mailService.
      */
     @Autowired
     private GMailService gmailService;
 
     /**
-     * dunno.
+     * link the msMailService.
      */
     @Autowired
     private MicrosoftMailService microsoftMailService;
@@ -52,7 +52,7 @@ public class MailController extends BaseController {
      * @return number of gmail unread.
      * @throws IOException              throw from gmailService
      * @throws GeneralSecurityException throw from gmailService
-     * @throws SecretFileAccesException 
+     * @throws SecretFileAccesException throw if you can't get the info from the properties
      */
     @RequestMapping("/nbrunreadmail/{userKey}")
     public @ResponseBody Object getNbrUnreadMail(@PathVariable("userKey") final String userKey)

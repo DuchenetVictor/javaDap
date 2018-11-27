@@ -19,7 +19,7 @@ import com.google.api.services.oauth2.Oauth2;
 public class UserInfoService extends GoogleBaseService {
 
     /**
-     *
+     * get the auth2 with the matched credential.
      * @param userId user key
      * @return the Oauth2 service
      * @throws GeneralSecurityException throws by getCredential from BaseService
@@ -48,11 +48,11 @@ public class UserInfoService extends GoogleBaseService {
     }
 
     /**
-     * dunno.
+     * Get the credential stored from the application.
      *
-     * @return .
-     * @throws IOException .
-     * @throws GeneralSecurityException .
+     * @return 
+     * @throws IOException throw if the get  flow fail
+     * @throws GeneralSecurityException throw if the get flow fail
      */
     public DataStore<StoredCredential> getCredentialDataStore() throws IOException, GeneralSecurityException {
         return getFlow().getCredentialDataStore();

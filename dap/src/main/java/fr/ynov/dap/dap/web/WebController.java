@@ -39,19 +39,34 @@ public class WebController {
 	 */
 	@Autowired
 	private UserInfoService userInfoService;
-	
+
+	/**
+	 * link the msMailService.
+	 */
 	@Autowired
 	private MicrosoftMailService microsoftMailService;
 
+	/**
+	 * link the appUserRepository.
+	 */
 	@Autowired
 	private AppUserRepostory appUSerRepository;
 
+	/**
+	 * launch the admin page with correct data
+	 * 
+	 * @param userKey the user in database
+	 * @param map     needed to pass param in the view for Thymeleaf
+	 * @return the name of the page called
+	 * @throws IOException              throw when fail to get the credential
+	 * @throws GeneralSecurityException throw when fail to get the credential
+	 */
 	@GetMapping("/admin/{userKey}")
 	public String getAdminPage(@PathVariable(value = "userKey") final String userKey, final ModelMap map)
 			throws IOException, GeneralSecurityException {
-		
+
 		AppUser appUser = appUSerRepository.findByUserKey(userKey);
-		if(appUser == null) {
+		if (appUser == null) {
 			return "Error";
 		}
 		List<StoredCredentialsResponse> storedCredentialsResponses = new ArrayList<>();
@@ -59,7 +74,6 @@ public class WebController {
 		mAccounts = appUser.getmAccounts();
 		List<GoogleAccount> gAccounts = new ArrayList<>();
 		gAccounts = appUser.getgAccounts();
-		
 
 		for (MicrosoftAccount microsoftAccount : mAccounts) {
 			storedCredentialsResponses.add(new StoredCredentialsResponse(microsoftAccount));
@@ -71,7 +85,7 @@ public class WebController {
 			storedCredentialsResponses.add(new StoredCredentialsResponse(googleAccount,
 					s.get(googleAccount.getAccountName()).getAccessToken()));
 		}
-		
+
 		map.addAttribute("comptes", storedCredentialsResponses);
 		map.addAttribute("userKey", userKey);
 		map.addAttribute("nbAccount", storedCredentialsResponses.size());
@@ -80,25 +94,35 @@ public class WebController {
 		return "mainPage";
 	}
 
+	/**
+	 * launch the mail's page from the user in bdd pass through the url
+	 * @param userKey the user in bdd get from the url param
+	 * @param map needed to pass param in the view for Thymeleaf
+	 * @return the name of the page called
+	 * @throws IOException throw when fail to get the credential
+	 * @throws SecretFileAccesException throw if you can't get the info from the
+	 *                                  properties
+	 */
 	@GetMapping("/admin/{userKey}/mails")
-	public String getMailsPage(@PathVariable(value = "userKey") final String userKey, final ModelMap map) throws IOException, SecretFileAccesException {
+	public String getMailsPage(@PathVariable(value = "userKey") final String userKey, final ModelMap map)
+			throws IOException, SecretFileAccesException {
 		AppUser appUser = appUSerRepository.findByUserKey(userKey);
-		if(appUser == null) {
+		if (appUser == null) {
 			return "Error";
 		}
 		List<MicrosoftAccount> mAccounts = new ArrayList<>();
 		mAccounts = appUser.getmAccounts();
-		
+
 		HashMap<String, MicrosoftMail[]> emails = new HashMap<>();
 		for (MicrosoftAccount microsoftAccount : mAccounts) {
-			
-			MicrosoftMail[]  mails = microsoftMailService.getMail(microsoftAccount,5);
-			emails.put(microsoftAccount.getAccountName(),mails);
-			
+
+			MicrosoftMail[] mails = microsoftMailService.getMail(microsoftAccount, 5);
+			emails.put(microsoftAccount.getAccountName(), mails);
+
 		}
-		
-		map.addAttribute("emails",emails);
-		
+
+		map.addAttribute("emails", emails);
+
 		return "mailsPage";
 	}
 }

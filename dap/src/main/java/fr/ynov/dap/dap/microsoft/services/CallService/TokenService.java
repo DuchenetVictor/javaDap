@@ -16,12 +16,12 @@ public interface TokenService {
     /**
      * call the auth2 for the microsoft token.
      *
-     * @param tenantId     dunno
-     * @param clientId     dunno
-     * @param clientSecret dunno
-     * @param grantType    dunno
-     * @param code         dunno
-     * @param redirectUrl  dunno
+     * @param tenantId     key of the token of the account
+     * @param clientId     id of the appli
+     * @param clientSecret application secret
+     * @param grantType    type of request ( refresh or authorisation )
+     * @param code         authorization code get from the first call
+     * @param redirectUrl  url redirect st in api microsoft
      * @return return the token response from microsoft
      */
     @FormUrlEncoded
@@ -32,15 +32,15 @@ public interface TokenService {
             @Field("redirect_uri") String redirectUrl);
 
     /**
-     * dunno.
+     * call the auth2 for trefresh the microsoft token.
      *
-     * @param tenantId     dunno
-     * @param clientId     dunno
-     * @param clientSecret dunno
-     * @param grantType    dunno
-     * @param code         dunno
-     * @param redirectUrl  dunno
-     * @return dunno
+     * @param tenantId     key of the token of the account
+     * @param clientId     id of the appli
+     * @param clientSecret application secret
+     * @param grantType    type of request ( refresh or authorisation )
+     * @param code         authorization code get from the first call
+     * @param redirectUrl  url redirect st in api microsoft
+     * @return the call of the token response
      */
     @FormUrlEncoded
     @POST("/{tenantid}/oauth2/v2.0/token")

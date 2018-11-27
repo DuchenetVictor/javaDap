@@ -22,7 +22,7 @@ public enum AccountTypeEnum {
     }
 
     /**
-     * @param nameOfEnum dunno
+     * @param nameOfEnum contruct of the enum
      */
     AccountTypeEnum(final String nameOfEnum) {
         this.name = nameOfEnum;

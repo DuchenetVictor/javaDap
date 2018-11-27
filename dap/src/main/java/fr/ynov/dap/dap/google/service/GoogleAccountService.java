@@ -44,10 +44,11 @@ public class GoogleAccountService extends GoogleBaseService {
 	 * @param session the HTTP Session
 	 * @return the view to display
 	 * @throws ServletException When Google account could not be connected to DaP.
+	 * @throws IOException throw if the redirect fail
 	 */
 
-	public String oAuthCallback(final String code, final HttpServletRequest request, final HttpSession session)
-			throws ServletException {
+	public void oAuthCallback(final String code, final HttpServletRequest request, final HttpSession session, final HttpServletResponse response)
+			throws ServletException, IOException {
 		final String decodedCode = extracCode(request);
 
 		final String redirectUri = buildRedirectUri(request, getConfig().getoAuth2CallbackUrl());
@@ -56,9 +57,9 @@ public class GoogleAccountService extends GoogleBaseService {
 		final String userKey = session.getAttribute("userKey").toString();
 		try {
 			final GoogleAuthorizationCodeFlow flow = super.getFlow();
-			final TokenResponse response = flow.newTokenRequest(decodedCode).setRedirectUri(redirectUri).execute();
+			final TokenResponse tokenResponse = flow.newTokenRequest(decodedCode).setRedirectUri(redirectUri).execute();
 
-			final Credential credential = flow.createAndStoreCredential(response, accountName);
+			final Credential credential = flow.createAndStoreCredential(tokenResponse, accountName);
 			if (null == credential || null == credential.getAccessToken()) {
 				getLogger().warn("Trying to store a NULL AccessToken for user : " + accountName);
 
@@ -80,7 +81,8 @@ public class GoogleAccountService extends GoogleBaseService {
 		account.setAccountName(accountName);
 		appUser.addGoogleAccount(account);
 		userAppRepository.save(appUser);
-		return "mainPage";
+		
+		response.sendRedirect("admin/"+userKey);
 	}
 
 	/**
@@ -137,10 +139,10 @@ public class GoogleAccountService extends GoogleBaseService {
 	 * @param accountName the user to store Data
 	 * @param request     the HTTP request
 	 * @param userKey     user in Bdd
-	 * @param httpSession dunno.
-	 * @param response    dunno
-	 * @throws GeneralSecurityException dunno.
-	 * @throws IOException              dunno.
+	 * @param httpSession http session.
+	 * @param response    the http response from the call.
+	 * @throws GeneralSecurityException throw if the get flow fail.
+	 * @throws IOException              throw if load of credential fail of the sett of redirection fail.
 	 */
 	public void addAccount(final String accountName, final String userKey, final HttpServletRequest request,
 			final HttpSession httpSession, final HttpServletResponse response)

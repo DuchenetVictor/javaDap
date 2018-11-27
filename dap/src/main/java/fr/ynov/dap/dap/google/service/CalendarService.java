@@ -43,7 +43,7 @@ public class CalendarService extends GoogleBaseService {
      *
      * @param nbrOfResult number of the event wanted
      * @param user        user key
-     * @return dunno
+     * @return list of event
      * @throws IOException              throw by the getService
      * @throws GeneralSecurityException throw by the getService
      */

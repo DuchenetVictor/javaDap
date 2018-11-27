@@ -40,10 +40,10 @@ public class MicrosoftAccountService extends MicrosoftBaseService {
 	/**
 	 * retrieve token from authCode.
 	 *
-	 * @param authCode dunno
-	 * @param tenantId dunno
+	 * @param authCode code required for the auth
+	 * @param tenantId code from the msAccountSaved
 	 * @return the tokenResponse
-	 * @throws SecretFileAccesException dunno
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
 	 */
 	public TokenResponse getTokenFromAuthCode(final String authCode, final String tenantId)
 			throws SecretFileAccesException {
@@ -70,12 +70,12 @@ public class MicrosoftAccountService extends MicrosoftBaseService {
 	}
 
 	/**
-	 * dunno.
+	 * get the url for login.
 	 *
-	 * @param state dunno
-	 * @param nonce dunno
-	 * @return dunno
-	 * @throws SecretFileAccesException ..
+	 * @param state uuid to ensure the security, the uuid should stay the same from the call to the response
+	 * @param nonce uuid to ensure the security, the uuid should stay the same from the call to the response
+	 * @return  ulr with all the param needed
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
 	 */
 	public String getLoginUrl(final UUID state, final UUID nonce) throws SecretFileAccesException {
 
@@ -124,15 +124,15 @@ public class MicrosoftAccountService extends MicrosoftBaseService {
 	/**
 	 * link the microsoft account with the userKey in bdd.
 	 *
-	 * @param accountName dunno
-	 * @param userKey     dunno
-	 * @param request     dunno
-	 * @param session     dunno
-	 * @param response    dunno
-	 * @param state       dunno
-	 * @param nonce       dunno
-	 * @throws IOException              dunno
-	 * @throws SecretFileAccesException dunno
+	 * @param accountName accountName of the msAccount
+	 * @param userKey     user in bdd
+	 * @param request     http call
+	 * @param session     http session
+	 * @param response    http response
+	 * @param state        uuid to ensure the security, the uuid should stay the same from the call to the response
+	 * @param nonce        uuid to ensure the security, the uuid should stay the same from the call to the response
+	 * @throws IOException              throw if an input or output exception occurs
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
 	 */
 	public void addAccount(final String accountName, final String userKey, final HttpServletRequest request,
 			final HttpSession session, final HttpServletResponse response, final UUID state, final UUID nonce)
@@ -160,10 +160,10 @@ public class MicrosoftAccountService extends MicrosoftBaseService {
 	/**
 	 * save the new accountName in userkey.
 	 *
-	 * @param tokenResponse dunno
-	 * @param userKey       dunno
-	 * @param accountName   dunno
-	 * @param tenantId      dunno
+	 * @param tokenResponse the token response
+	 * @param userKey       user in bdd
+	 * @param accountName   nale of the MicrosoftAccountaccount
+	 * @param tenantId      key of the user 
 	 */
 	public void saveNewAccountNameInUserKey(final TokenResponse tokenResponse, final String userKey,
 			final String accountName, final String tenantId) {

@@ -55,10 +55,10 @@ public class AccountController extends BaseController {
      * @param accountType the type of the account (like google or microsoft)
      * @param request     the HTTP request
      * @param session     the HTTP session
-     * @param response    dunno
+     * @param response    the response of the call
      * @throws GeneralSecurityException throw if the addCount fail
      * @throws IOException              throw if the call from accountService fail
-     * @throws SecretFileAccesException dunno
+     * @throws SecretFileAccesException throw if you can't get the info from the properties
      */
     @GetMapping("/account/add/{userKey}/{accountName}/{accountType}")
     public void addAccount(@PathVariable("userKey") final String userKey,
@@ -88,11 +88,12 @@ public class AccountController extends BaseController {
      * @param session session open
      * @return redirection to google.
      * @throws ServletException throw if the call from googleAccount fail
+     * @throws IOException if the redirection fail
      */
     @RequestMapping("/oAuth2Callback")
-    public String oAuthCallback(@RequestParam final String code, final HttpServletRequest request,
-            final HttpSession session) throws ServletException {
-        return googleAccountService.oAuthCallback(code, request, session);
+    public void oAuthCallback(@RequestParam final String code, final HttpServletRequest request,
+            final HttpSession session, final HttpServletResponse response) throws ServletException, IOException {
+        googleAccountService.oAuthCallback(code, request, session, response);
     }
 
     @Override
@@ -101,18 +102,19 @@ public class AccountController extends BaseController {
     }
 
     /**
-     * dunno.
+     * recupere les infoamtion de connections depuis la page d'authente microsoft.
      *
-     * @param code    dunno
-     * @param idToken dunno
-     * @param state   dunno
-     * @param request dunno
-     * @return dunno
-     * @throws SecretFileAccesException dunno
+     * @param code    the token not decoded
+     * @param idToken object that carry the tenant id
+     * @param state   uuid that must match with  
+     * @param request http call
+     * @return redirect in the mainpage with the user in bdd authorized.
+     * @throws SecretFileAccesException throw if you can't get the info from the properties
+     * @throws IOException throw if the redirect fail
      */
     @PostMapping(value = "/authorize")
-    public String authorize(@RequestParam("code") final String code, @RequestParam("id_token") final String idToken,
-            @RequestParam("state") final UUID state, final HttpServletRequest request) throws SecretFileAccesException {
+    public void authorize(@RequestParam("code") final String code, @RequestParam("id_token") final String idToken,
+            @RequestParam("state") final UUID state, final HttpServletRequest request, final HttpServletResponse response) throws SecretFileAccesException, IOException {
 
         // Get the expected state value from the session
         HttpSession session = request.getSession();
@@ -137,7 +139,6 @@ public class AccountController extends BaseController {
         } else {
             session.setAttribute("error", "Unexpected state returned from authority.");
         }
-        // TODO : redirecte vers page admin pour montrer token
-        return "mainPage";
+        response.sendRedirect("admin/"+userKey);
     }
 }

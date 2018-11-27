@@ -25,7 +25,7 @@ public class Config {
 	private String microsoftUrlCallBack;
 
 	/**
-	 * dunno.
+	 * the authority url for the first connection.
 	 */
 	@Value("${microsoft.authority.url}")
 	private String microsoftAuthorityUrl;

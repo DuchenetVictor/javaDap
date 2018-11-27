@@ -106,7 +106,7 @@ abstract class MicrosoftBaseService {
 	 * get properties from microsoft properties client' secret.
 	 *
 	 * @return Porperties with all the info from the file with the client'secret
-	 * @throws SecretFileAccesException dunno.
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
 	 */
 	private Properties getClientProperties() throws SecretFileAccesException {
 		if (clientProperties == null) {
@@ -124,15 +124,14 @@ abstract class MicrosoftBaseService {
 	}
 
 	/**
-	 * dunno .
+	 * refresh the token if the experation date is expired, save directly in the msAccount Bdd
 	 *
-	 * @param expirationDate dunno
-	 * @param refreshToken   dunno
-	 * @param accesToken     dunno
-	 * @param tenantId       dunno
-	 * @return dunno
-	 * @throws IOException              dunno
-	 * @throws SecretFileAccesException dunno
+	 * @param expirationDate date expiration of the token 
+	 * @param refreshToken   token used for the call when you want to refresh the main token
+	 * @param accesToken     the main token
+	 * @param tenantId       msAccount  id
+	 * @throws IOException              throw if fail to get the new token
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
 	 */
 	public void ensureTokens(final MicrosoftAccount microsoftAccount) throws IOException, SecretFileAccesException {
 
@@ -172,12 +171,12 @@ abstract class MicrosoftBaseService {
 
 	
 	/**
-	 * dunno.
+	 * to get the Microsoftservice used for ask the api provided by microsoft
 	 *
-	 * @param accessToken dunno
-	 * @return dunno
-	 * @throws SecretFileAccesException
-	 * @throws IOException
+	 * @param accessToken the main token 
+	 * @return the microsoft service
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
+	 * @throws IOException if the ensure token fail
 	 */
 	protected MicrosoftService getMicrosoftService(final MicrosoftAccount microsoftAccount) throws IOException, SecretFileAccesException {
 
@@ -213,30 +212,30 @@ abstract class MicrosoftBaseService {
 	}
 
 	/**
-	 * dunno.
+	 * get the redirect url password from properties.
 	 *
 	 * @return redirect url from client'secret file
-	 * @throws SecretFileAccesException dunno
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
 	 */
 	protected String getRedirectUrl() throws SecretFileAccesException {
 		return getClientProperties().getProperty(REDIRECT_URL);
 	}
 
 	/**
-	 * dunno.
+	 * get the application password from properties.
 	 *
 	 * @return password from client'secret file
-	 * @throws SecretFileAccesException dunno
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
 	 */
 	protected String getAppPassword() throws SecretFileAccesException {
 		return getClientProperties().getProperty(APP_PASSWORD);
 	}
 
 	/**
-	 * dunno.
+	 * get the application id from properties..
 	 *
 	 * @return app id from client'secret file
-	 * @throws SecretFileAccesException dunno
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
 	 */
 	protected String getAppId() throws SecretFileAccesException {
 		return getClientProperties().getProperty(APP_ID);

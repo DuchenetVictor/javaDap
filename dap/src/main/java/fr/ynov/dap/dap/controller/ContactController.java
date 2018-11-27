@@ -49,7 +49,7 @@ public class ContactController extends BaseController {
 	 * @return number of contact
 	 * @throws GeneralSecurityException throw if the contactService fail
 	 * @throws IOException              throw if the contactService fail
-	 * @throws SecretFileAccesException 
+	 * @throws SecretFileAccesException throw if you can't get the info from the properties
 	 */
 	@GetMapping("/nbrContact/{userKey}")
 	public @ResponseBody Integer nbrOfContact(@PathVariable("userKey") final String userKey)

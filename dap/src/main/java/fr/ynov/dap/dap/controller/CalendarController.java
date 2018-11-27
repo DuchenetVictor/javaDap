@@ -50,9 +50,15 @@ public class CalendarController extends BaseController {
 	@Autowired
 	private CalendarService calendarService;
 
+	/**
+	 * link the msEventService.
+	 */
 	@Autowired
 	private MicrosoftEventService microsoftEventService;
-	
+
+	/**
+	 * link the msAccountService.
+	 */
 	@Autowired
 	private MicrosoftAccountService microsoftAccountService;
 
@@ -69,22 +75,22 @@ public class CalendarController extends BaseController {
 	private AppUserRepostory appUserRepository;
 
 	/**
-	 * dunno.
+	 * get the number off event from account in user in Bdd.
 	 *
-	 * @param nbrEvent .
+	 * @param nbrEvent nomber of event needed to display
 	 * @param userKey  user in bdd
 	 * @return list of CalendarEvent
 	 * @throws GeneralSecurityException throws by calendarService when it try to
 	 *                                  getCredential
 	 * @throws IOException              throws by userInfoSErvice or calendarService
 	 * @throws NumberFormatException    if the nbrEvent cannot be cast as an integer
-	 * @throws SecretFileAccesException
-	 * @throws ParseException
+	 * @throws SecretFileAccesException throw if you can't get the info from the
+	 *                                  properties
 	 */
 	@GetMapping("/getNextEvent/{nbrEnvent}/{userKey}")
 	public @ResponseBody List<CalendarEvent> getNextEvent(@PathVariable(value = "nbrEnvent") final String nbrEvent,
-			@PathVariable("userKey") final String userKey) throws NumberFormatException, IOException,
-			GeneralSecurityException, SecretFileAccesException, ParseException {
+			@PathVariable("userKey") final String userKey)
+			throws NumberFormatException, IOException, GeneralSecurityException, SecretFileAccesException {
 
 		AppUser appUser = appUserRepository.findByUserKey(userKey);
 		if (appUser == null) {
@@ -119,6 +125,12 @@ public class CalendarController extends BaseController {
 		return calendarEvents;
 	}
 
+	/**
+	 * format the date for msService in UTc ( time in MSServer, where is stocked
+	 * event).
+	 * 
+	 * @return dateFormated in String
+	 */
 	private String getUTCDateNowformated() {
 		SimpleDateFormat dateFormatUTC = new SimpleDateFormat("yyyy-MM-dd");
 		dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
