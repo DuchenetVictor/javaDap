@@ -17,12 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import com.google.api.client.auth.oauth2.TokenResponse;
-
-import fr.ynov.dap.dap.exception.SecretFileAccesException;
-
 import fr.ynov.dap.dap.enums.AccountTypeEnum;
+import fr.ynov.dap.dap.exception.SecretFileAccesException;
 import fr.ynov.dap.dap.google.service.GoogleAccountService;
 import fr.ynov.dap.dap.microsoft.services.MicrosoftAccountService;
 import fr.ynov.dap.dap.model.IdToken;
@@ -58,7 +54,8 @@ public class AccountController extends BaseController {
      * @param response    the response of the call
      * @throws GeneralSecurityException throw if the addCount fail
      * @throws IOException              throw if the call from accountService fail
-     * @throws SecretFileAccesException throw if you can't get the info from the properties
+     * @throws SecretFileAccesException throw if you can't get the info from the
+     *                                  properties
      */
     @GetMapping("/account/add/{userKey}/{accountName}/{accountType}")
     public void addAccount(@PathVariable("userKey") final String userKey,
@@ -83,12 +80,12 @@ public class AccountController extends BaseController {
     /**
      * retrieve the token send by google and store it.
      *
-     * @param code    code return from google service
-     * @param request the resquet given
-     * @param session session open
-     * @return redirection to google.
+     * @param code     code return from google service
+     * @param request  the resquet given
+     * @param session  session open
+     * @param response http response of the call
      * @throws ServletException throw if the call from googleAccount fail
-     * @throws IOException if the redirection fail
+     * @throws IOException      if the redirection fail
      */
     @RequestMapping("/oAuth2Callback")
     public void oAuthCallback(@RequestParam final String code, final HttpServletRequest request,
@@ -106,15 +103,16 @@ public class AccountController extends BaseController {
      *
      * @param code    the token not decoded
      * @param idToken object that carry the tenant id
-     * @param state   uuid that must match with  
+     * @param state   uuid that must match with
      * @param request http call
-     * @return redirect in the mainpage with the user in bdd authorized.
-     * @throws SecretFileAccesException throw if you can't get the info from the properties
-     * @throws IOException throw if the redirect fail
+     * @throws SecretFileAccesException throw if you can't get the info from the
+     *                                  properties
+     * @throws IOException              throw if the redirect fail
      */
     @PostMapping(value = "/authorize")
     public void authorize(@RequestParam("code") final String code, @RequestParam("id_token") final String idToken,
-            @RequestParam("state") final UUID state, final HttpServletRequest request, final HttpServletResponse response) throws SecretFileAccesException, IOException {
+            @RequestParam("state") final UUID state, final HttpServletRequest request,
+            final HttpServletResponse response) throws SecretFileAccesException, IOException {
 
         // Get the expected state value from the session
         HttpSession session = request.getSession();
@@ -139,6 +137,6 @@ public class AccountController extends BaseController {
         } else {
             session.setAttribute("error", "Unexpected state returned from authority.");
         }
-        response.sendRedirect("admin/"+userKey);
+        response.sendRedirect("admin/" + userKey);
     }
 }
